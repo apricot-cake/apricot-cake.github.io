@@ -1,0 +1,45 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import CategoryNav from '../components/CategoryNav.astro';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+interface Props { posts: CollectionEntry<'blog'>[]; category?: 'apps'; }
+const { posts, category } = Astro.props;
+---
+<!doctype html>
+<html lang="ja">
+ <head><BaseHead title={category ? 'アプリ | ' + SITE_TITLE : SITE_TITLE} /></head>
+ <body>
+  <Header />
+  <main id="main">
+   <h1 class="sr-only">{category ? 'アプリ' : SITE_TITLE}</h1>
+   <aside><CategoryNav selected={category} /></aside>
+   <section aria-label={category ? 'アプリの記事' : 'すべての記事'}>
+    <ul class="cards">
+     {posts.map(post => <li>
+      <a class="card" href={'/blog/' + post.id + '/'}>
+       {post.data.heroImage && <div class="thumbnail"><Image src={post.data.heroImage} width={800} alt="" /></div>}
+       <h2>{post.data.title}</h2>
+      </a>
+     </li>)}
+    </ul>
+   </section>
+  </main>
+  <Footer />
+ </body>
+</html>
+<style>
+ main { width: min(100%, 1200px); margin: 0 auto; padding: 64px 32px 96px; display: grid; grid-template-columns: 132px minmax(0, 1fr); align-content: start; gap: 48px; }
+ .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 24px; margin: 0; padding: 0; list-style: none; }
+ .card { display: block; text-decoration: none; }
+ .thumbnail { overflow: hidden; border-radius: 8px; background: var(--surface); }
+ .thumbnail img { width: 100%; transition: opacity 180ms ease; }
+ .card:hover img { opacity: 0.85; }
+ h2 { margin-top: 16px; font-size: 16px; font-weight: 400; letter-spacing: -0.01em; }
+ @media (max-width: 900px) { main { gap: 32px; grid-template-columns: 108px minmax(0, 1fr); } }
+ @media (max-width: 720px) { main { padding: 32px 20px 64px; grid-template-columns: minmax(0, 1fr); gap: 32px; } }
+ @media (max-width: 520px) { .cards { grid-template-columns: minmax(0, 1fr); gap: 32px; } }
+</style>

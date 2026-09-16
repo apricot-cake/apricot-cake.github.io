@@ -1,0 +1,23 @@
+---
+import { SITE_TITLE } from '../consts';
+import HeaderLink from './HeaderLink.astro';
+---
+<a class="skip-link" href="#main">本文へ移動</a>
+<header>
+ <div class="header-inner">
+  <a class="brand" href="/">{SITE_TITLE}</a>
+  <nav aria-label="メインナビゲーション">
+   <HeaderLink href="/">Home</HeaderLink>
+   <HeaderLink href="/links">Links</HeaderLink>
+  </nav>
+ </div>
+</header>
+<style>
+ header { border-bottom: 1px solid var(--line); background: #fff; }
+ .header-inner { min-height: 64px; max-width: 1440px; margin: auto; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+ .brand { font-size: 18px; font-weight: 400; letter-spacing: 0.04em; text-decoration: none; }
+ nav { display: flex; align-items: center; gap: 32px; }
+ .skip-link { position: fixed; top: 8px; left: 16px; transform: translateY(-200%); background: white; padding: 8px 16px; z-index: 10; }
+ .skip-link:focus { transform: none; }
+ @media (max-width: 640px) { .header-inner { min-height: 60px; padding: 0 20px; } nav { gap: 24px; } }
+</style>

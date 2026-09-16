@@ -1,0 +1,40 @@
+:root {
+ color-scheme: light;
+ --text: #1e293b;
+ --muted: #64748b;
+ --line: #e2e8f0;
+ --surface: #f8fafc;
+ font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
+ color: var(--text);
+ background: #fff;
+ font-synthesis: none;
+ -webkit-font-smoothing: antialiased;
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100svh; display: flex; flex-direction: column; font-size: 14px; line-height: 1.75; overflow-wrap: anywhere; }
+main { flex: 1; }
+a { color: inherit; text-underline-offset: 4px; }
+a:hover { color: #0f172a; }
+a:focus-visible, button:focus-visible { outline: 2px solid #475569; outline-offset: 5px; }
+img { display: block; max-width: 100%; height: auto; }
+h1, h2, h3, h4 { font-weight: 500; line-height: 1.4; margin: 0; }
+h1 { font-size: clamp(24px, 3vw, 32px); letter-spacing: -0.025em; }
+button, input, select, textarea { font: inherit; }
+::selection { background: #e2e8f0; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.prose { font-size: 15px; line-height: 1.95; }
+.prose p { margin: 0 0 1.5em; }
+.prose h2, .prose h3 { margin: 2em 0 0.8em; }
+.prose h2 { font-size: 22px; }
+.prose h3 { font-size: 18px; }
+.prose ul, .prose ol { margin: 0 0 1.5em; padding-left: 1.5em; }
+.prose li + li { margin-top: 0.35em; }
+.prose img { border-radius: 8px; }
+.prose blockquote { margin: 1.5em 0; padding-left: 1.25em; border-left: 2px solid var(--line); color: var(--muted); }
+.prose code { padding: 0.15em 0.35em; border-radius: 3px; background: var(--surface); font-size: 0.9em; }
+.prose pre { padding: 1.25em; overflow-x: auto; border-radius: 8px; }
+.prose pre code { padding: 0; background: transparent; }
+.prose table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; }
+.prose th, .prose td { padding: 0.6em 1em; border-bottom: 1px solid var(--line); text-align: left; }
+.prose hr { margin: 2em 0; border: 0; border-top: 1px solid var(--line); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }

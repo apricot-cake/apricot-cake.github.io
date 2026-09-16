@@ -1,0 +1,9 @@
+---
+import { getEntry, render } from 'astro:content';
+import Page from '../layouts/Page.astro';
+
+const links = await getEntry('pages', 'links');
+if (!links) throw new Error('リンク集がありません。コンテンツを取得してください。');
+const { Content } = await render(links);
+---
+<Page frontmatter={links.data}><Content /></Page>

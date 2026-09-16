@@ -1,0 +1,12 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+type Props = HTMLAttributes<'a'>;
+const { href, class: className, ...props } = Astro.props;
+const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = href === '/' ? pathname === '/' || pathname.startsWith('/categories/') || pathname.startsWith('/blog/') : pathname === href;
+---
+<a href={href} class:list={[className, { active: isActive }]} aria-current={isActive ? 'page' : undefined} {...props}><slot /></a>
+<style>
+ a { display: inline-block; padding: 10px 0; color: var(--muted); font-size: 14px; text-decoration: none; transition: color 150ms ease; }
+ a.active, a:hover { color: var(--text); }
+</style>

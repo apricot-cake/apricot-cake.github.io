@@ -1,0 +1,31 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+type Props = CollectionEntry<'blog'>['data'];
+const { title, description, heroImage } = Astro.props;
+---
+<!doctype html>
+<html lang="ja">
+ <head><BaseHead title={title + ' | ' + SITE_TITLE} description={description} image={heroImage} /></head>
+ <body>
+  <Header />
+  <main id="main">
+   <article>
+    <h1>{title}</h1>
+    {heroImage && <Image class="article-image" width={960} src={heroImage} alt="" />}
+    <div class="prose"><slot /></div>
+   </article>
+  </main>
+  <Footer />
+ </body>
+</html>
+<style>
+ main { width: min(100%, 864px); margin: 0 auto; padding: 64px 32px 96px; }
+ h1 { margin-bottom: 32px; }
+ .article-image { width: 100%; border-radius: 8px; margin-bottom: 40px; }
+ @media (max-width: 640px) { main { padding: 36px 20px 64px; } h1 { margin-bottom: 24px; } .article-image { margin-bottom: 32px; } }
+</style>

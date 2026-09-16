@@ -1,0 +1,30 @@
+{
+  "name": "apricot-cake.github.io",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "content:pull": "node --env-file-if-exists=.env scripts/content.mjs pull",
+    "content:upload": "node --env-file-if-exists=.env scripts/content.mjs upload",
+    "build:pages": "npm run content:pull && astro build"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^8.0.1",
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.3.2",
+    "sharp": "^0.35.0"
+  },
+  "allowScripts": {
+    "esbuild": true
+  },
+  "devDependencies": {
+    "@aws-sdk/client-s3": "^3.1133.0"
+  }
+}
