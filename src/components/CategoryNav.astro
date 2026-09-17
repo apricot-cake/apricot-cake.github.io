@@ -3,7 +3,6 @@ interface Props { selected?: string; }
 const { selected } = Astro.props;
 ---
 <nav aria-label="カテゴリ">
- <h2 class="mb-5 text-xs font-normal tracking-[0.06em] text-muted max-[721px]:mb-3">カテゴリ</h2>
  <ul class="m-0 flex list-none flex-col items-start gap-2.5 p-0 max-[721px]:flex-row max-[721px]:flex-wrap">
   <li><a class="inline-block min-w-[90px] rounded-full border border-line px-[18px] py-1.5 text-center text-xs leading-[1.75] text-muted no-underline transition-colors duration-150 ease-[ease] hover:border-slate-400 hover:text-ink aria-[current=page]:border-ink aria-[current=page]:bg-ink aria-[current=page]:text-white" href="/" aria-current={!selected ? 'page' : undefined}>すべて</a></li>
   <li><a class="inline-block min-w-[90px] rounded-full border border-line px-[18px] py-1.5 text-center text-xs leading-[1.75] text-muted no-underline transition-colors duration-150 ease-[ease] hover:border-slate-400 hover:text-ink aria-[current=page]:border-ink aria-[current=page]:bg-ink aria-[current=page]:text-white" href="/categories/apps/" aria-current={selected === 'apps' ? 'page' : undefined}>アプリ</a></li>
