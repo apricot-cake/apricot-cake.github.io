@@ -14,15 +14,15 @@ const { posts, category } = Astro.props;
  <head><BaseHead title={category ? 'アプリ | ' + SITE_TITLE : SITE_TITLE} /></head>
  <body>
   <Header />
-  <main id="main">
+  <main id="main" class="mx-auto grid w-full max-w-[1200px] grid-cols-[132px_minmax(0,1fr)] content-start gap-12 px-8 pt-16 pb-24 max-[901px]:grid-cols-[108px_minmax(0,1fr)] max-[901px]:gap-8 max-[721px]:grid-cols-1 max-[721px]:px-5 max-[721px]:pt-8 max-[721px]:pb-16">
    <h1 class="sr-only">{category ? 'アプリ' : SITE_TITLE}</h1>
    <aside><CategoryNav selected={category} /></aside>
    <section aria-label={category ? 'アプリの記事' : 'すべての記事'}>
-    <ul class="cards">
+    <ul class="m-0 grid list-none grid-cols-2 gap-x-6 gap-y-10 p-0 max-[521px]:grid-cols-1 max-[521px]:gap-8">
      {posts.map(post => <li>
-      <a class="card" href={'/blog/' + post.id + '/'}>
-       {post.data.heroImage && <div class="thumbnail"><Image src={post.data.heroImage} width={800} alt="" /></div>}
-       <h2>{post.data.title}</h2>
+      <a class="group block no-underline" href={'/blog/' + post.id + '/'}>
+       {post.data.heroImage && <div class="overflow-hidden rounded-lg bg-surface"><Image class="w-full transition-opacity duration-[180ms] ease-[ease] group-hover:opacity-85" src={post.data.heroImage} width={800} alt="" /></div>}
+       <h2 class="mt-4 text-base leading-[1.4] font-normal tracking-[-0.01em]">{post.data.title}</h2>
       </a>
      </li>)}
     </ul>
@@ -31,15 +31,3 @@ const { posts, category } = Astro.props;
   <Footer />
  </body>
 </html>
-<style>
- main { width: min(100%, 1200px); margin: 0 auto; padding: 64px 32px 96px; display: grid; grid-template-columns: 132px minmax(0, 1fr); align-content: start; gap: 48px; }
- .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 24px; margin: 0; padding: 0; list-style: none; }
- .card { display: block; text-decoration: none; }
- .thumbnail { overflow: hidden; border-radius: 8px; background: var(--surface); }
- .thumbnail img { width: 100%; transition: opacity 180ms ease; }
- .card:hover img { opacity: 0.85; }
- h2 { margin-top: 16px; font-size: 16px; font-weight: 400; letter-spacing: -0.01em; }
- @media (max-width: 900px) { main { gap: 32px; grid-template-columns: 108px minmax(0, 1fr); } }
- @media (max-width: 720px) { main { padding: 32px 20px 64px; grid-template-columns: minmax(0, 1fr); gap: 32px; } }
- @media (max-width: 520px) { .cards { grid-template-columns: minmax(0, 1fr); gap: 32px; } }
-</style>

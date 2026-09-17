@@ -11,20 +11,10 @@ const { frontmatter } = Astro.props;
  <head><BaseHead title={frontmatter.title + ' | ' + SITE_TITLE} /></head>
  <body>
   <Header />
-  <main id="main">
-   <h1>{frontmatter.title}</h1>
-   <div class="links"><slot /></div>
+  <main id="main" class="mx-auto w-full max-w-[704px] px-8 pt-16 pb-24 max-[641px]:px-5 max-[641px]:pt-9 max-[641px]:pb-16">
+   <h1 class="mb-10">{frontmatter.title}</h1>
+   <div class="[&_p]:m-0 [&_p]:border-b [&_p]:border-line [&_p:first-child]:border-t [&_a]:flex [&_a]:items-center [&_a]:justify-between [&_a]:py-[22px] [&_a]:text-[15px] [&_a]:no-underline [&_a]:after:text-lg [&_a]:after:text-muted [&_a]:after:content-['↗'] [&_a:hover]:text-muted"><slot /></div>
   </main>
   <Footer />
  </body>
 </html>
-<style>
- main { width: min(100%, 704px); margin: 0 auto; padding: 64px 32px 96px; }
- h1 { margin-bottom: 40px; }
- .links :global(p) { margin: 0; border-bottom: 1px solid var(--line); }
- .links :global(p:first-child) { border-top: 1px solid var(--line); }
- .links :global(a) { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; text-decoration: none; font-size: 15px; }
- .links :global(a)::after { content: '↗'; color: var(--muted); font-size: 18px; }
- .links :global(a:hover) { color: var(--muted); }
- @media (max-width: 640px) { main { padding: 36px 20px 64px; } }
-</style>

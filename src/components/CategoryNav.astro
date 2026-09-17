@@ -3,17 +3,9 @@ interface Props { selected?: string; }
 const { selected } = Astro.props;
 ---
 <nav aria-label="カテゴリ">
- <h2>カテゴリ</h2>
- <ul>
-  <li><a href="/" aria-current={!selected ? 'page' : undefined}>すべて</a></li>
-  <li><a href="/categories/apps/" aria-current={selected === 'apps' ? 'page' : undefined}>アプリ</a></li>
+ <h2 class="mb-5 text-xs font-normal tracking-[0.06em] text-muted max-[721px]:mb-3">カテゴリ</h2>
+ <ul class="m-0 flex list-none flex-col items-start gap-2.5 p-0 max-[721px]:flex-row max-[721px]:flex-wrap">
+  <li><a class="inline-block min-w-[90px] rounded-full border border-line px-[18px] py-1.5 text-center text-xs leading-[1.75] text-muted no-underline transition-colors duration-150 ease-[ease] hover:border-slate-400 hover:text-ink aria-[current=page]:border-ink aria-[current=page]:bg-ink aria-[current=page]:text-white" href="/" aria-current={!selected ? 'page' : undefined}>すべて</a></li>
+  <li><a class="inline-block min-w-[90px] rounded-full border border-line px-[18px] py-1.5 text-center text-xs leading-[1.75] text-muted no-underline transition-colors duration-150 ease-[ease] hover:border-slate-400 hover:text-ink aria-[current=page]:border-ink aria-[current=page]:bg-ink aria-[current=page]:text-white" href="/categories/apps/" aria-current={selected === 'apps' ? 'page' : undefined}>アプリ</a></li>
  </ul>
 </nav>
-<style>
- h2 { margin-bottom: 20px; color: var(--muted); font-size: 12px; font-weight: 400; letter-spacing: 0.06em; }
- ul { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; list-style: none; margin: 0; padding: 0; }
- a { display: inline-block; min-width: 90px; padding: 6px 18px; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); text-align: center; text-decoration: none; font-size: 12px; transition: color 150ms ease, border-color 150ms ease; }
- a:hover { border-color: #94a3b8; color: var(--text); }
- a[aria-current='page'] { border-color: var(--text); background: var(--text); color: white; }
- @media (max-width: 720px) { h2 { margin-bottom: 12px; } ul { flex-direction: row; flex-wrap: wrap; } }
-</style>

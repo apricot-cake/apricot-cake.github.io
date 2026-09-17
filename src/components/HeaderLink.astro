@@ -5,8 +5,4 @@ const { href, class: className, ...props } = Astro.props;
 const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isActive = href === '/' ? pathname === '/' || pathname.startsWith('/categories/') || pathname.startsWith('/blog/') : pathname === href;
 ---
-<a href={href} class:list={[className, { active: isActive }]} aria-current={isActive ? 'page' : undefined} {...props}><slot /></a>
-<style>
- a { display: inline-block; padding: 10px 0; color: var(--muted); font-size: 14px; text-decoration: none; transition: color 150ms ease; }
- a.active, a:hover { color: var(--text); }
-</style>
+<a href={href} class:list={['inline-block py-2.5 text-sm leading-[1.75] no-underline transition-colors duration-150 ease-[ease] hover:text-ink', isActive ? 'text-ink' : 'text-muted', className]} aria-current={isActive ? 'page' : undefined} {...props}><slot /></a>

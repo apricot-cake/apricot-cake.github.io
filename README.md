@@ -1,6 +1,6 @@
 # QL
 
-Astro・TypeScript・Astro Components・CSSで作る個人サイトです。MarkdownとMDXに対応しています。
+Astro・TypeScript・Astro Components・Tailwind CSS v4で作る個人サイトです。MarkdownとMDXに対応しています。
 
 ## 開発
 
@@ -28,4 +28,4 @@ Astro・TypeScript・Astro Components・CSSで作る個人サイトです。Mark
 ## ページとデザイン
 
 `/`が記事一覧、`/categories/apps/`がアプリ一覧、`/blog/<記事名>/`が記事、`/links/`がリンク集です。
-共通CSSは`src/styles/global.css`、レイアウトは`src/layouts/`、共通部品は`src/components/`にあります。
+Tailwindは公式のViteプラグインで読み込みます。レイアウトの装飾は各Astroファイルのユーティリティクラス、テーマ・基本設定・Markdown本文の装飾は`src/styles/global.css`で管理します。レイアウトは`src/layouts/`、共通部品は`src/components/`にあります。
