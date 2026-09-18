@@ -1,6 +1,7 @@
 ---
 title: "Sift"
 category: apps
+description: 'SNSや動画サイトの投稿を反応数でフィルターする拡張機能'
 heroImage: '../assets/sift.png'
 cardUrl: 'https://chromewebstore.google.com/detail/sift/jglehalaegleehefcefnfmmbblgkomeh'
 cardLinkLabel: 'Chrome ウェブストアで開く'
