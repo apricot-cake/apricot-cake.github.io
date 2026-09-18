@@ -3,6 +3,7 @@ title: "Sift"
 category: apps
 heroImage: '../assets/sift.png'
 cardUrl: 'https://chromewebstore.google.com/detail/sift/jglehalaegleehefcefnfmmbblgkomeh'
+cardLinkLabel: 'Chrome ウェブストアで開く'
 pubDate: 2026-09-04T03:27:26.000Z
 updatedDate: 2026-09-13T07:09:45.000Z
 ---

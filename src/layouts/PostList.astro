@@ -23,6 +23,7 @@ const { posts, category } = Astro.props;
       <a class="group block no-underline" href={post.data.cardUrl ?? '/blog/' + post.id + '/'}>
        {post.data.heroImage && <div class="overflow-hidden rounded-lg bg-surface"><Image class="w-full transition-opacity duration-[180ms] ease-[ease] group-hover:opacity-85" src={post.data.heroImage} width={800} alt="" /></div>}
        <h2 class="mt-4 text-base leading-[1.4] font-normal tracking-[-0.01em]">{post.data.title}</h2>
+       {post.data.cardUrl && <p class="mt-1 text-sm leading-[1.5] text-muted">{post.data.cardLinkLabel ?? '外部サイトで開く'} <span aria-hidden="true">↗</span></p>}
       </a>
      </li>)}
     </ul>

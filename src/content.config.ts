@@ -11,6 +11,7 @@ const blog = defineCollection({
 			category: z.enum(['apps']),
 			description: z.string().optional(),
 			cardUrl: z.string().url().optional(),
+			cardLinkLabel: z.string().optional(),
 			// Transform string to Date object
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
