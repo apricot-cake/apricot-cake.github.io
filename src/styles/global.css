@@ -1,7 +1,8 @@
 @import "tailwindcss";
+@import "@fontsource-variable/source-sans-3/wght.css";
 
 @theme {
- --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
+ --font-sans: "Source Sans 3 Variable", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif;
  --color-ink: #1e293b;
  --color-muted: #64748b;
  --color-line: #e2e8f0;
@@ -14,7 +15,7 @@
  main { @apply flex-1; }
  a { @apply text-inherit underline-offset-4 hover:text-slate-900; }
  a:focus-visible, button:focus-visible { @apply outline-2 outline-offset-[5px] outline-slate-600; }
- h1, h2, h3, h4 { @apply m-0 font-medium leading-[1.4]; }
+ h1, h2, h3, h4 { @apply m-0 font-semibold leading-[1.4]; }
  h1 { @apply text-[clamp(24px,3vw,32px)] tracking-[-0.025em]; }
  ::selection { @apply bg-line; }
 }
