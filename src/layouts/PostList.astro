@@ -20,7 +20,7 @@ const { posts, category } = Astro.props;
    <section aria-label={category ? 'アプリの記事' : 'すべての記事'}>
     <ul class="m-0 grid list-none grid-cols-2 gap-x-6 gap-y-10 p-0 max-[521px]:grid-cols-1 max-[521px]:gap-8">
      {posts.map(post => <li>
-      <a class="group block no-underline" href={'/blog/' + post.id + '/'}>
+      <a class="group block no-underline" href={post.data.cardUrl ?? '/blog/' + post.id + '/'}>
        {post.data.heroImage && <div class="overflow-hidden rounded-lg bg-surface"><Image class="w-full transition-opacity duration-[180ms] ease-[ease] group-hover:opacity-85" src={post.data.heroImage} width={800} alt="" /></div>}
        <h2 class="mt-4 text-base leading-[1.4] font-normal tracking-[-0.01em]">{post.data.title}</h2>
       </a>
