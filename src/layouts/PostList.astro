@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
+import ExternalLink from '@lucide/astro/icons/external-link';
 import CategoryNav from '../components/CategoryNav.astro';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
@@ -22,7 +23,7 @@ const { posts, category } = Astro.props;
      {posts.map(post => <li>
       <a class="group block no-underline" href={post.data.cardUrl ?? '/blog/' + post.id + '/'}>
        {post.data.heroImage && <div class="overflow-hidden rounded-lg bg-surface"><Image class="w-full transition-opacity duration-[180ms] ease-[ease] group-hover:opacity-85" src={post.data.heroImage} width={800} alt="" /></div>}
-       <h2 class="mt-4 flex items-center gap-1 text-base leading-[1.4] font-semibold tracking-[-0.01em]">{post.data.title}{post.data.cardUrl && <><svg class="size-3.5 text-muted" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6" /><path d="M10 14 21 3" /><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1 2-2V8a2 2 0 0 1 2-2h6" /></svg><span class="sr-only">（{post.data.cardLinkLabel ?? '外部サイトで開く'}）</span></>}</h2>
+       <h2 class="mt-4 flex items-center gap-1 text-base leading-[1.4] font-semibold tracking-[-0.01em]">{post.data.title}{post.data.cardUrl && <><ExternalLink class="size-3.5 text-muted" aria-hidden="true" /><span class="sr-only">（{post.data.cardLinkLabel ?? '外部サイトで開く'}）</span></>}</h2>
        {post.data.description && <p class="mt-2 text-sm leading-[1.6] text-muted">{post.data.description}</p>}
       </a>
      </li>)}
