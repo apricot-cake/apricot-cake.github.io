@@ -1,5 +1,4 @@
 import { Tooltip } from 'radix-ui'
-import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ButtonGroup } from '@/components/ui/button-group'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
@@ -45,11 +44,6 @@ export default function App() {
   }, [])
   const [boot, setBoot] = useState<Boot | null>(null)
   const [doc, setDoc] = useState<Catalog | null>(null)
-  const [organizing, setOrganizing] = useState(false)
-  const [organizeResult, setOrganizeResult] = useState('')
-  const [renameId, setRenameId] = useState('')
-  const [renameName, setRenameName] = useState('')
-  const [renaming, setRenaming] = useState(false)
   const [error, setError] = useState('')
   const [status, setStatus] = useState('読み込み中')
   const [selected, setSelected] = useState<string[]>([])
@@ -127,22 +121,8 @@ export default function App() {
     } catch(e) { setError((e as Error).message) }
     finally { setChoosingFolder(false) }
   }
-  async function organize(action: string, extra: Record<string, unknown> = {}) {
-    if (status !== '保存済み' || organizing) return
-    setOrganizing(true); setError(''); setOrganizeResult('')
-    try {
-      const response = await fetch(`/api/${action}`, {method:'POST',headers:{'Content-Type':'application/json','X-Tagger-Context':context.current},body:JSON.stringify({files:selected,work,revision:revision.current,...extra})})
-      const b=await response.json()
-      if(!response.ok) throw Error(b.error)
-      if(b.cancelled)return
-      setBoot(b);setDoc(b.document);latest.current=b.document;revision.current=b.document.revision;saved.current=serialize(b.document)
-      setHistory([]);setFuture([])
-      if(b.result?.copied!==undefined)setOrganizeResult(`${b.result.copied}枚コピー・${b.result.skipped}件は既存画像を使用${b.result.errors.length ? ' ／ '+b.result.errors.join('、') : ''}`)
-      if(action==='rename-tag')setRenaming(false)
-    } catch(e) {setError((e as Error).message)} finally {setOrganizing(false)}
-  }
   function commit(next: Catalog) {
-    if (organizing || !doc || serialize(next) === serialize(doc)) return
+    if (!doc || serialize(next) === serialize(doc)) return
     setFuture([]); setHistory(h => [...h.slice(-49), doc]); latest.current = next; setDoc(next); setStatus('未保存')
   }
   function undo() {
@@ -166,11 +146,8 @@ export default function App() {
   })
   const works = doc?.tags.filter(t => !t.parent) || []
   const characters = doc?.tags.filter(t => t.parent === work && t.name.toLocaleLowerCase().includes(tagQuery.toLocaleLowerCase())) || []
-  const classified = (file: string) => boot?.destination ? !!boot.classification?.matches[file]?.length : !!doc?.images[file]?.length
-  const effectiveTags = (file: string) => [...new Set([...(doc?.images[file]||[]),...(boot?.classification?.matches[file]||[]).flatMap(m=>{
-    const parent=works.find(t=>t.name===m.parts[0]);if(!parent)return []
-    const child=doc?.tags.find(t=>t.parent===parent.id&&t.name===m.parts[1]);return [child?.id||parent.id]
-  })])]
+  const classified = (file: string) => !!doc?.images[file]?.length
+  const effectiveTags = (file: string) => doc?.images[file] || []
   const visible = files.filter(file => (filter !== 'untagged' || !classified(file)) && (filter !== 'tagged' || classified(file)) && (!characterFilter || effectiveTags(file).includes(characterFilter)) && (!workFilter || hasTag(effectiveTags(file), workFilter, doc?.tags || [])))
 
   const tagged = files.filter(classified).length
@@ -209,7 +186,7 @@ export default function App() {
   }
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.defaultPrevented || organizing || renaming || choosingFolder || (e.target as HTMLElement)?.closest('input,textarea,select,[contenteditable],[role=combobox],[role=listbox],[role=option],[role=slider],[data-slot=popover-content]')) return
+      if (e.defaultPrevented || choosingFolder || (e.target as HTMLElement)?.closest('input,textarea,select,[contenteditable],[role=combobox],[role=listbox],[role=option],[role=slider],[data-slot=popover-content]')) return
       if (zoom) return
       if (!e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
         if (e.key === '1') { e.preventDefault(); setCharacterOpen(false); setWorkQuery(''); setWorkOpen(true); return }
@@ -231,7 +208,7 @@ export default function App() {
             <h1 className="mr-auto text-lg font-semibold leading-none">Fandocker</h1>
             <Popover><PopoverTrigger asChild><Button className="text-xs" size="sm" variant="outline">フィルタ</Button></PopoverTrigger>
               <PopoverContent align="start" className="w-72 space-y-3">
-                <div className="space-y-1.5"><Label>分類状態</Label><Choice label="分類状態で絞り込み" value={filter} onValueChange={setFilter} options={[{value:'all',label:'すべて'},{value:'untagged',label:`未分類 ${files.length-tagged}`},{value:'tagged',label:`分類済み ${tagged}`}]} /></div>
+                <div className="space-y-1.5"><Label>タグ付け状態</Label><Choice label="タグ付け状態で絞り込み" value={filter} onValueChange={setFilter} options={[{value:'all',label:'すべて'},{value:'untagged',label:`未タグ付け ${files.length-tagged}`},{value:'tagged',label:`タグ付け済み ${tagged}`}]} /></div>
                 <div className="space-y-1.5"><Label>作品</Label><Choice label="作品で絞り込み" value={workFilter} onValueChange={v => {setWorkFilter(v);setCharacterFilter('')}} options={[{value:'',label:'全作品'},...works.map(t=>({value:t.id,label:t.name}))]} /></div>
                 <div className="space-y-1.5"><Label>タグ</Label><Choice label="タグで絞り込み" value={characterFilter} disabled={!workFilter} onValueChange={setCharacterFilter} options={[{value:'',label:'全タグ'},...doc.tags.filter(t=>t.parent===workFilter).map(t=>({value:t.id,label:t.name}))]} /></div>
               </PopoverContent>
@@ -247,13 +224,6 @@ export default function App() {
             </Popover>
         <Button className="text-xs" size="sm" variant="outline" disabled={status !== '保存済み' || choosingFolder} onClick={selectFolder}><FolderOpen />フォルダー選択</Button>
 
-        <Popover><PopoverTrigger asChild><Button className="text-xs" size="sm" variant="outline">整理</Button></PopoverTrigger><PopoverContent align="end" className="w-80 space-y-3">
-          <p className="break-all text-xs text-muted-foreground">{boot.destination||'整理先が未指定です'}</p>
-          <Button variant="outline" disabled={organizing||status!=='保存済み'} onClick={()=>void organize('destination')}>整理先を選択</Button>
-          <div className="flex flex-wrap gap-2"><Button variant="outline" disabled={!boot.destination||organizing||status!=='保存済み'} onClick={()=>void organize('classification')}>再確認</Button><Button variant="outline" disabled={!boot.classification?.canUndo||organizing||status!=='保存済み'} onClick={()=>void organize('copy-undo')}>コピーを取り消す</Button></div>
-          <Button variant="outline" disabled={!boot.destination||organizing||status!=='保存済み'} onClick={()=>setRenaming(true)}>作品・キャラ名を編集</Button>
-          <a className="block text-xs underline" href="/api/export?kind=illustrations" download>YAMLを書き出す</a>
-        </PopoverContent></Popover>
         <div role="group" aria-label="操作履歴" className="flex items-center gap-1.5">
           <Button className="text-xs" size="sm" variant="outline" disabled={!history.length} onClick={undo}><Undo2 />取り消す</Button>
           <Button className="text-xs" size="sm" variant="outline" disabled={!future.length} onClick={redo}><Redo2 />やり直す</Button>
@@ -294,7 +264,6 @@ export default function App() {
             </div>
             {active?<Button variant="ghost" onClick={()=>setZoom(true)} aria-label="画像を拡大" className="relative h-[260px] w-full bg-white p-2 hover:bg-white active:translate-y-0 min-[1500px]:h-[330px]"><img src={imageUrl(active,boot.context)} alt={active} className="absolute inset-0 size-full object-contain" /></Button>:<p className="py-20 text-center text-sm text-muted-foreground">画像を選択してください</p>}
             </>}
-            {boot.destination&&<div className="mt-4 space-y-2"><Button disabled={organizing||status!=='保存済み'||!selected.length||selected.some(f=>!doc.images[f]?.length&&!work)} onClick={()=>void organize('copy')}>{organizing?'処理中…':'選択画像を分類先へコピー'}</Button><p className="text-xs text-muted-foreground">元画像は残ります</p>{selected.length===1&&boot.classification?.matches[active]?.map(m=><p key={m.path} className="break-all text-xs text-muted-foreground">分類済み：{m.parts.join(' / ')||'整理先直下'}</p>)}{organizeResult&&<p role="status" className="text-xs">{organizeResult}</p>}</div>}
             <div className="mt-5 flex min-h-8 flex-wrap items-center gap-1.5">
               {selectedTags.map(t=><Button key={t.id} variant="secondary" size="sm" onClick={()=>removeTag(t.id)} title="選択した画像から外す" className="h-auto max-w-full whitespace-normal py-1.5 text-xs">{t.parent&&<span className="text-muted-foreground">{works.find(w=>w.id===t.parent)?.name} /</span>}{t.name}{selected.length>1&&<span className="text-muted-foreground">{selected.filter(f=>doc.images[f]?.includes(t.id)).length}/{selected.length}</span>}<X className="size-3" /></Button>)}
               {!selectedTags.length&&<span className="text-xs text-muted-foreground">まだタグが付いていません</span>}
@@ -331,8 +300,6 @@ export default function App() {
         </ScrollArea>
       </section>
     </main>
-    <Dialog open={organizing}><DialogContent showCloseButton={false} onEscapeKeyDown={e=>e.preventDefault()} onInteractOutside={e=>e.preventDefault()}><DialogTitle className="flex items-center gap-2"><LoaderCircle className="size-4 animate-spin" />処理中</DialogTitle><DialogDescription>完了するまでお待ちください。</DialogDescription></DialogContent></Dialog>
-    <Dialog open={renaming} onOpenChange={setRenaming}><DialogContent><DialogTitle>作品・キャラ名を編集</DialogTitle><DialogDescription>対応するフォルダーの名前を変更します。</DialogDescription><Choice label="編集する分類" value={renameId} onValueChange={id=>{setRenameId(id);setRenameName(doc.tags.find(t=>t.id===id)?.name||'')}} options={doc.tags.map(t=>({value:t.id,label:t.parent?`${works.find(w=>w.id===t.parent)?.name} / ${t.name}`:t.name}))} /><Input aria-label="新しい名前" value={renameName} onChange={e=>setRenameName(e.target.value)} /><Button disabled={!renameId||!renameName.trim()||organizing} onClick={()=>void organize('rename-tag',{id:renameId,name:renameName.trim()})}>名前を変更</Button></DialogContent></Dialog>
     <Dialog open={zoom} onOpenChange={setZoom}><DialogContent className="w-[calc(100vw-2rem)] max-w-none sm:max-w-[calc(100vw-4rem)]" aria-describedby={undefined}><DialogTitle className="sr-only">{active}</DialogTitle>{active&&<img src={imageUrl(active,boot.context)} alt={active} className="mx-auto max-h-[85dvh] max-w-full object-contain" />}</DialogContent></Dialog>
     <Dialog open={choosingFolder}><DialogContent showCloseButton={false} onEscapeKeyDown={e=>e.preventDefault()} onInteractOutside={e=>e.preventDefault()}><DialogTitle className="flex items-center gap-2 text-sm"><LoaderCircle className="size-4 animate-spin" />フォルダー選択</DialogTitle><DialogDescription>フォルダーを選択してください…</DialogDescription></DialogContent></Dialog>
   </div>

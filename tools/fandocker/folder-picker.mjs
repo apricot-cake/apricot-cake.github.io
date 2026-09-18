@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 const run = promisify(execFile);
-export async function pickFolder({ destination = false } = {}) {
+export async function pickFolder() {
   const script = `Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
@@ -44,7 +44,7 @@ public static class FandockerFolderPicker {
   }
 }
 "@
-$selected = [FandockerFolderPicker]::Pick('${destination ? '整理先フォルダーを選択' : '画像フォルダーを選択'}')
+$selected = [FandockerFolderPicker]::Pick('画像フォルダーを選択')
 if ($selected) { [Console]::Write([Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($selected))) }`;
   const { stdout } = await run('powershell.exe', ['-NoProfile','-STA','-EncodedCommand',Buffer.from(script,'utf16le').toString('base64')], {windowsHide:true,maxBuffer:65536});
   return stdout.trim() ? Buffer.from(stdout.trim(),'base64').toString('utf8') : null;

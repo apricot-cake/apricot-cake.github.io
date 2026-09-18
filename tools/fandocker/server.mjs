@@ -1,4 +1,3 @@
-import { createOrganizer, distinctFolders, validName } from './organizer.mjs';
 import { pickFolder } from './folder-picker.mjs';
 import { createServer } from 'node:http';
 import { readFile, writeFile, rename, mkdir, readdir, copyFile, stat } from 'node:fs/promises';
@@ -17,9 +16,8 @@ export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Us
   let dates = await readDates(folder,files);
   let fileSet = new Set(files);
   await mkdir(dataDir, { recursive:true });
-  let storePath = path.join(dataDir, '.tagger-catalog.json');
-  let document = { version:1, revision:0, tags:[], images:{} };
-  try { document = JSON.parse(await readFile(storePath, 'utf8')); } catch(e) { if (e.code !== 'ENOENT') throw e;try {document=parse(await readFile(path.join(dataDir,'catalog.yaml'),'utf8'))}catch(legacy){if(legacy.code!=='ENOENT')throw legacy} }
+  let storePath = path.join(dataDir, 'catalog.yaml');
+  let document = await readCatalog(dataDir);
   function validate(doc) {
     if (!doc || doc.version !== 1 || !Number.isSafeInteger(doc.revision) || !Array.isArray(doc.tags) || !doc.images || Array.isArray(doc.images) || typeof doc.images !== 'object') throw Error('保存データの形式が不正です');
     const ids = new Set();
@@ -32,23 +30,30 @@ export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Us
     for (const t of doc.tags) { const key = `${t.parent || ''}\0${t.name.trim()}`; if(names.has(key)) throw Error('同じ名前のタグがあります'); names.add(key); }
     for (const [name, tags] of Object.entries(doc.images)) if (path.basename(name) !== name || !Array.isArray(tags) || tags.some(id => !ids.has(id)) || new Set(tags).size !== tags.length) throw Error('画像のタグが不正です');
   }
-  validate(document);
-  const organizer=createOrganizer();
-  const settingsPath=()=>path.join(dataDir,'.tagger-destination.json');
-  let destination=null;
-  async function loadDestination() {try {destination=JSON.parse(await readFile(settingsPath(),'utf8')).destination} catch(e) {if(e.code!=='ENOENT') throw e;destination=null}}
-  await loadDestination();
-  let classification={matches:{},folders:[],canUndo:false};
-  async function refreshClassification() {
-    if(!destination) {classification={matches:{},folders:[],canUndo:false};return}
-    classification=await organizer.scan(folder,destination,files);
-    // 既存の分類先を選択肢へ取り込み、割り当てはファイルの実在とは分けて保持する。
-    for(const parts of classification.folders) {
-      let parent;
-      for(const name of parts) {let tag=document.tags.find(t=>t.name===name&&t.parent===parent);if(!tag){tag={id:randomUUID(),name,...(parent?{parent}:{})};document.tags.push(tag)}parent=tag.id}
+  async function readCatalog(dir) {
+    const yamlPath = path.join(dir, 'catalog.yaml');
+    const legacyPath = path.join(dir, '.tagger-catalog.json');
+    let legacy;
+    try { legacy = JSON.parse(await readFile(legacyPath, 'utf8')); }
+    catch (e) { if (e.code !== 'ENOENT') throw e; }
+    if (legacy) {
+      validate(legacy);
+      const suffix = randomUUID();
+      try { await copyFile(yamlPath, yamlPath + '.before-migration-' + suffix + '.bak'); }
+      catch (e) { if (e.code !== 'ENOENT') throw e; }
+      const tmp = yamlPath + '.' + suffix + '.tmp';
+      await writeFile(tmp, stringify(legacy), 'utf8');
+      await rename(tmp, yamlPath);
+      await rename(legacyPath, legacyPath + '.migrated-' + suffix + '.bak');
+      return legacy;
     }
+    let value = { version:1, revision:0, tags:[], images:{} };
+    try { value = parse(await readFile(yamlPath, 'utf8')); }
+    catch (e) { if (e.code !== 'ENOENT') throw e; }
+    validate(value);
+    return value;
   }
-  const bootState=()=>({document,files,folder,dataDir,context,dates,destination,classification});
+  const bootState=()=>({document,files,folder,dataDir,context,dates});
   let context = randomUUID();
   let picking = false;
   let vite;
@@ -61,52 +66,7 @@ export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Us
       if (![`127.0.0.1:${actualPort}`, `localhost:${actualPort}`].includes(host)) return send(res,403,{error:'許可されていない接続です'});
       if(req.headers.origin && ![`http://127.0.0.1:${actualPort}`,`http://localhost:${actualPort}`].includes(req.headers.origin)) return send(res,403,{error:'別のページからの操作はできません'});
       const url = new URL(req.url, `http://${host}`);
-      if (url.pathname === '/api/state' && req.method === 'GET') {await queue;await refreshClassification();return send(res,200,bootState())}
-      if (['/api/destination','/api/classification','/api/copy','/api/copy-undo','/api/rename-tag'].includes(url.pathname) && req.method==='POST') {
-        if(req.headers['x-tagger-context']!==context) return send(res,409,{error:'フォルダーが変更されています。再読み込みしてください'});
-        let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>2_000_000)return send(res,413,{error:'データが大きすぎます'})}
-        const payload=body?JSON.parse(body):{};
-        const requestedContext=context;
-        let chosen;
-        if(url.pathname==='/api/destination') {
-          if(picking)return send(res,409,{error:'フォルダー選択中です'});
-          picking=true;try{chosen=await chooseFolder({destination:true})}finally{picking=false}
-          if(!chosen)return send(res,200,{cancelled:true});
-        }
-        const job=queue.then(async()=>{
-          if(requestedContext!==context) return send(res,409,{error:'フォルダーが変更されています'});
-          let result={};
-          if(chosen) {
-            await distinctFolders(folder,chosen);
-            const checked=await organizer.scan(folder,chosen,files);
-            await writeFile(settingsPath(),JSON.stringify({destination:path.resolve(chosen)}),'utf8');
-            destination=path.resolve(chosen);classification=checked;organizer.clearHistory();
-          } else if(!destination) throw Error('整理先フォルダーを選んでください');
-          if(url.pathname==='/api/copy') {
-            if(payload.revision!==document.revision)throw Error('分類先が変更されています。保存完了後に再実行してください');
-            if(!Array.isArray(payload.files)||!payload.files.length||payload.files.some(f=>!fileSet.has(f)))throw Error('画像を選んでください');
-            const plans=[...new Set(payload.files)].map(file=>{
-              const assigned=document.images[file]||[];
-              const fallback=document.tags.find(t=>t.id===payload.work&&!t.parent);
-              const tags=(assigned.length?assigned:fallback?[fallback.id]:[]).map(id=>document.tags.find(t=>t.id===id));
-              const targets=tags.filter(t=>t.parent||!tags.some(c=>c.parent===t.id)).map(t=>t.parent?[document.tags.find(w=>w.id===t.parent).name,t.name]:[t.name]);
-              return {file,targets};
-            });
-            result=await organizer.copy(folder,destination,plans);
-          }
-          if(url.pathname==='/api/copy-undo')await organizer.undo();
-          if(url.pathname==='/api/rename-tag') {
-            const tag=document.tags.find(t=>t.id===payload.id);if(!tag)throw Error('分類がありません');
-            if(document.tags.some(t=>t.id!==tag.id&&t.parent===tag.parent&&t.name.toLowerCase()===String(payload.name).toLowerCase()))throw Error('同名の分類があります');
-            const parts=tag.parent?[document.tags.find(t=>t.id===tag.parent).name,tag.name]:[tag.name];
-            validName(payload.name);
-            try {await organizer.renameFolder(destination,parts,payload.name)} catch(e) {if(e.code!=='ENOENT')throw e}
-            tag.name=payload.name;document.revision++;
-            await writeFile(storePath,JSON.stringify(document),'utf8');
-          }
-          await refreshClassification();send(res,200,{...bootState(),result});
-        });queue=job.catch(()=>{});await job;return;
-      }
+      if (url.pathname === '/api/state' && req.method === 'GET') {await queue;return send(res,200,bootState())}
       if (url.pathname === '/api/folder' && req.method === 'POST') {
         if (req.headers['x-tagger-context'] !== context) return send(res,409,{error:'フォルダーが変更されています。再読み込みしてください。'});
         if (picking) return send(res,409,{error:'フォルダー選択中です'});
@@ -117,13 +77,11 @@ export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Us
           const job = queue.then(async () => {
             const nextFolder = path.resolve(chosen);
             const nextFiles = (await readdir(nextFolder,{withFileTypes:true})).filter(f=>f.isFile() && /\.(png|jpe?g|webp|gif|avif)$/i.test(f.name)).map(f=>f.name).sort((a,b)=>a.localeCompare(b,'en',{numeric:true}));
-            const nextPath = path.join(nextFolder,'.tagger-catalog.json');
-            let next = {version:1,revision:0,tags:[],images:{}};
-            try { next=JSON.parse(await readFile(nextPath,'utf8')); } catch(e) { if(e.code!=='ENOENT') throw e;try {next=parse(await readFile(path.join(nextFolder,'catalog.yaml'),'utf8'))}catch(legacy){if(legacy.code!=='ENOENT')throw legacy} }
-            validate(next);
+            const nextPath = path.join(nextFolder,'catalog.yaml');
+            const next = await readCatalog(nextFolder);
             const nextDates = await readDates(nextFolder,nextFiles);
             dates=nextDates; folder=nextFolder; dataDir=nextFolder; storePath=nextPath; files=nextFiles; fileSet=new Set(files); document=next; context=randomUUID();
-            organizer.clearHistory();await loadDestination();await refreshClassification();send(res,200,bootState());
+            send(res,200,bootState());
           });
           queue=job.catch(()=>{}); await job;
         } finally { picking=false; }
@@ -138,7 +96,7 @@ export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Us
           for(const name of Object.keys(next.images)) if(!fileSet.has(name) && !(name in document.images)) return send(res,400,{error:'存在しない画像です'});
           next = {version:1,revision:document.revision+1,tags:next.tags,images:next.images};
           const tmp = storePath + '.' + randomUUID() + '.tmp';
-          await writeFile(tmp,JSON.stringify(next),'utf8');
+          await writeFile(tmp,stringify(next),'utf8');
           try { await copyFile(storePath,storePath+'.bak'); } catch(e) { if(e.code!=='ENOENT') throw e; }
           await rename(tmp,storePath);
           document=next;
@@ -179,9 +137,3 @@ export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Us
   return server;
 }
 if (process.argv[1] && path.resolve(process.argv[1])===fileURLToPath(import.meta.url)) await startServer({dev:!process.argv.includes('--production')});
-
-
-
-
-
-

@@ -30,7 +30,7 @@ test('保存、再起動、親子タグ、競合、外部アクセス、元画�
     server=await startServer({folder:temp,dataDir,port:0}); base=`http://127.0.0.1:${server.address().port}`;
     const restored=await (await fetch(base+'/api/state')).json(); assert.deepEqual(restored.document.images,doc.images);
     assert.equal((await put({...restored.document,context:restored.context,images:{'sample.png':[]}})).status,200);
-    assert.deepEqual(parse(await readFile(path.join(dataDir,'.tagger-catalog.json.bak'),'utf8')).images,doc.images);
+    assert.deepEqual(parse(await readFile(path.join(dataDir,'catalog.yaml.bak'),'utf8')).images,doc.images);
     assert.equal(await readFile(path.join(temp,'sample.png'),'utf8'),'original-image');
   } finally { await new Promise(resolve=>server.close(resolve)); await rm(temp,{recursive:true,force:true}); }
 });
@@ -57,4 +57,35 @@ test('フォルダー切り替えは選択先のYAMLを読み、古い画面か�
     assert.equal((await (await fetch(base+'/api/folder',{method:'POST',headers:{'X-Tagger-Context':switched.context}})).json()).cancelled,true);
     assert.equal((await (await fetch(base+'/api/state')).json()).folder,second);
   } finally { await new Promise(resolve=>server.close(resolve)); await rm(temp,{recursive:true,force:true}); }
+});
+
+test('JSONの最新編集をYAMLへ一度だけ移し、移行前データを保持する', async () => {
+  const temp=await mkdtemp(path.join(os.tmpdir(),'fandocker-migrate-'));
+  const {readdir}=await import('node:fs/promises');
+  const old='version: 1\nrevision: 0\ntags: []\nimages: {}\n';
+  const latest={version:1,revision:7,tags:[{id:'work',name:'作品'}],images:{'sample.png':['work']}};
+  await writeFile(path.join(temp,'sample.png'),'original');
+  await writeFile(path.join(temp,'catalog.yaml'),old);
+  await writeFile(path.join(temp,'.tagger-catalog.json'),JSON.stringify(latest));
+  let server;
+  try {
+    server=await startServer({folder:temp,port:0});
+    const base=`http://127.0.0.1:${server.address().port}`;
+    const boot=await (await fetch(base+'/api/state')).json();
+    assert.deepEqual(boot.document,latest);
+    assert.equal('destination' in boot,false);
+    assert.deepEqual(parse(await readFile(path.join(temp,'catalog.yaml'),'utf8')),latest);
+    const names=await readdir(temp);
+    assert.equal(names.includes('.tagger-catalog.json'),false);
+    assert.equal(await readFile(path.join(temp,names.find(n=>n.startsWith('catalog.yaml.before-migration-'))),'utf8'),old);
+    assert.deepEqual(JSON.parse(await readFile(path.join(temp,names.find(n=>n.startsWith('.tagger-catalog.json.migrated-'))),'utf8')),latest);
+    assert.equal((await fetch(base+'/api/copy',{method:'POST'})).status,405);
+    assert.equal((await fetch(base+'/api/state',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({...latest,context:boot.context,images:{'sample.png':[]}})})).status,200);
+    await new Promise(resolve=>server.close(resolve));server=null;
+    server=await startServer({folder:temp,port:0});
+    const restored=await (await fetch(`http://127.0.0.1:${server.address().port}/api/state`)).json();
+    assert.equal(restored.document.revision,8);
+    assert.deepEqual(restored.document.images,{'sample.png':[]});
+    assert.equal(await readFile(path.join(temp,'sample.png'),'utf8'),'original');
+  } finally {if(server)await new Promise(resolve=>server.close(resolve));await rm(temp,{recursive:true,force:true})}
 });

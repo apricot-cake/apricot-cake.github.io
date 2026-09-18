@@ -9,7 +9,7 @@
     "lint": "oxlint",
     "preview": "node server.mjs --production",
     "start": "node server.mjs",
-    "test": "node --test server.test.mjs organizer.test.mjs"
+    "test": "node --test server.test.mjs"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",
