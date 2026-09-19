@@ -264,9 +264,9 @@ export default function App() {
               </SettingsMenuContent>
             </Popover>
         <Popover><PopoverTrigger asChild><Button className="text-xs" size="sm" variant="outline"><Folder />フォルダー</Button></PopoverTrigger>
-          <PopoverContent align="end" className="w-56 gap-1 p-1">
-            <Button className="w-full justify-start" variant="ghost" disabled={!boot || boot.folderMissing} onClick={openFolder}><ExternalLink />エクスプローラーで開く</Button>
-            <Button className="w-full justify-start" variant="ghost" disabled={status !== '保存済み' || choosingFolder} onClick={selectFolder}><ArrowLeftRight />フォルダーを切り替え</Button>
+          <PopoverContent align="end" className="w-max items-start gap-1 p-1">
+            <Button className="justify-start" variant="ghost" disabled={!boot || boot.folderMissing} onClick={openFolder}><ExternalLink />エクスプローラーで開く</Button>
+            <Button className="justify-start" variant="ghost" disabled={status !== '保存済み' || choosingFolder} onClick={selectFolder}><ArrowLeftRight />フォルダーを切り替え</Button>
           </PopoverContent>
         </Popover>
         <Button className="text-xs" size="sm" variant="outline" disabled={!boot} onClick={refreshImages}>{refreshed ? <Check /> : <RefreshCw />}{refreshed ? '更新済み' : '更新'}</Button>
