@@ -11,7 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Choice } from '@/components/choice'
-import { ChevronDown, ArrowDown, ArrowUp, ArrowLeft, ArrowRight, FolderOpen, Undo2, Redo2, X, Check, LoaderCircle } from 'lucide-react'
+import { ChevronDown, ArrowDown, ArrowUp, ArrowLeft, ArrowRight, ExternalLink, FolderOpen, Undo2, Redo2, X, Check, LoaderCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { hasTag, imageUrl } from './model'
@@ -228,7 +228,7 @@ export default function App() {
                 <div className="space-y-3"><Label htmlFor="thumbnail-size">サムネイルサイズ</Label><Slider id="thumbnail-size" aria-label="サムネイルサイズ" min={80} max={280} step={5} value={[thumbnailSize]} onValueChange={v=>setThumbnailSize(v[0])} /></div>
               </PopoverContent>
             </Popover>
-        <Button className="text-xs" size="sm" variant="outline" disabled={!boot || boot.folderMissing} onClick={openFolder}><FolderOpen />フォルダーを開く</Button>
+        <Button className="text-xs" size="sm" variant="outline" disabled={!boot || boot.folderMissing} onClick={openFolder}><ExternalLink />エクスプローラーで開く</Button>
         <Button className="text-xs" size="sm" variant="outline" disabled={status !== '保存済み' || choosingFolder} onClick={selectFolder}><FolderOpen />フォルダー選択</Button>
 
         <div role="group" aria-label="操作履歴" className="flex items-center gap-1.5">
