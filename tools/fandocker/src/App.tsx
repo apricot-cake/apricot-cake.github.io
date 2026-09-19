@@ -32,6 +32,9 @@ function readView(): { sort: string; filter: string; workFilter: string; charact
 function ShortcutTooltip({ label, children }: { label: string; children: React.ReactElement }) {
   return <Tooltip.Provider delayDuration={300}><Tooltip.Root><Tooltip.Trigger asChild onFocus={e=>e.preventDefault()}><span className="inline-flex">{children}</span></Tooltip.Trigger><Tooltip.Portal><Tooltip.Content side="bottom" sideOffset={6} className="z-50 flex items-center gap-1.5 rounded-md bg-neutral-700 px-2 py-1.5 text-[11px] text-white shadow-md"><span>Press</span><kbd className="inline-flex h-5 min-w-5 items-center justify-center rounded border border-white/40 bg-white/10 px-1.5 py-0.5 font-sans text-[11px] leading-none shadow-[0_1px_0_0_rgba(255,255,255,0.25)]">{label}</kbd><Tooltip.Arrow className="fill-neutral-700" /></Tooltip.Content></Tooltip.Portal></Tooltip.Root></Tooltip.Provider>
 }
+function SettingsMenuContent({ align, children }: { align: 'start' | 'end'; children: React.ReactNode }) {
+  return <PopoverContent align={align} className="w-72 gap-4 p-3">{children}</PopoverContent>
+}
 export default function App() {
   const [initialView] = useState(readView)
   const [scrolled, setScrolled] = useState(false)
@@ -245,20 +248,20 @@ export default function App() {
           <div className="flex flex-wrap items-center justify-end gap-2" data-testid="filters">
             <h1 className="mr-auto text-lg font-semibold leading-none">Fandocker</h1>
             <Popover><PopoverTrigger asChild><Button className="relative text-xs" size="sm" variant="outline" aria-label={hasActiveFilters ? 'フィルタ（適用中）' : 'フィルタ'}><ListFilter />フィルタ{hasActiveFilters && <span className="absolute -right-1 -top-1 size-2 rounded-full bg-primary ring-2 ring-background" aria-hidden="true" />}</Button></PopoverTrigger>
-              <PopoverContent align="start" className="w-72 gap-3 p-2">
-                <div className="space-y-1.5"><Label>タグ付け状態</Label><Choice label="タグ付け状態で絞り込み" value={filter} onValueChange={setFilter} options={[{value:'all',label:'すべて'},{value:'untagged',label:`未タグ付け ${files.length-tagged}`},{value:'tagged',label:`タグ付け済み ${tagged}`}]} /></div>
-                <div className="space-y-1.5"><Label>作品</Label><Choice label="作品で絞り込み" value={workFilter} onValueChange={v => {setWorkFilter(v);setCharacterFilter('')}} options={[{value:'',label:'全作品'},...works.map(t=>({value:t.id,label:t.name}))]} /></div>
-                <div className="space-y-1.5"><Label>タグ</Label><Choice label="タグで絞り込み" value={characterFilter} disabled={!workFilter} onValueChange={setCharacterFilter} options={[{value:'',label:'全タグ'},...doc.tags.filter(t=>t.parent===workFilter).map(t=>({value:t.id,label:t.name}))]} /></div>
-              </PopoverContent>
+              <SettingsMenuContent align="start">
+                <div className="space-y-2"><Label>タグ付け状態</Label><Choice label="タグ付け状態で絞り込み" value={filter} onValueChange={setFilter} options={[{value:'all',label:'すべて'},{value:'untagged',label:`未タグ付け ${files.length-tagged}`},{value:'tagged',label:`タグ付け済み ${tagged}`}]} /></div>
+                <div className="space-y-2"><Label>作品</Label><Choice label="作品で絞り込み" value={workFilter} onValueChange={v => {setWorkFilter(v);setCharacterFilter('')}} options={[{value:'',label:'全作品'},...works.map(t=>({value:t.id,label:t.name}))]} /></div>
+                <div className="space-y-2"><Label>タグ</Label><Choice label="タグで絞り込み" value={characterFilter} disabled={!workFilter} onValueChange={setCharacterFilter} options={[{value:'',label:'全タグ'},...doc.tags.filter(t=>t.parent===workFilter).map(t=>({value:t.id,label:t.name}))]} /></div>
+              </SettingsMenuContent>
             </Popover>
             <Popover><PopoverTrigger asChild><Button className="text-xs" size="sm" variant="outline"><SlidersHorizontal />表示</Button></PopoverTrigger>
-              <PopoverContent align="end" className="w-72 gap-4 p-3">
+              <SettingsMenuContent align="end">
                 <div className="space-y-2"><Label>並び順</Label><ButtonGroup className="w-full min-w-0" aria-label="ソート">
               <Choice label="並び順" value={sort.split('-')[0]} onValueChange={v=>setSort(`${v}-${sort.split('-')[1]}`)} options={[{value:'name',label:'ファイル名'},{value:'modified',label:'更新日時'},{value:'created',label:'作成日時'}]} className="flex-1 pr-3" />
               <Button className="text-xs" variant="outline" size="icon" aria-label={sort.endsWith('-asc')?'昇順（クリックで降順）':'降順（クリックで昇順）'} onClick={()=>setSort(`${sort.split('-')[0]}-${sort.endsWith('-asc')?'desc':'asc'}`)}>{sort.endsWith('-asc')?<ArrowUp />:<ArrowDown />}</Button>
             </ButtonGroup></div>
                 <div className="space-y-2"><Label htmlFor="thumbnail-size">サムネイルサイズ</Label><Slider id="thumbnail-size" aria-label="サムネイルサイズ" min={80} max={280} step={5} value={[thumbnailSize]} onValueChange={v=>setThumbnailSize(v[0])} /></div>
-              </PopoverContent>
+              </SettingsMenuContent>
             </Popover>
         <Popover><PopoverTrigger asChild><Button className="text-xs" size="sm" variant="outline"><Folder />フォルダー</Button></PopoverTrigger>
           <PopoverContent align="end" className="w-56 gap-1 p-1">
