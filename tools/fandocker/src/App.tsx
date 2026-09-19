@@ -213,14 +213,14 @@ export default function App() {
           <div className="flex flex-wrap items-center justify-end gap-2" data-testid="filters">
             <h1 className="mr-auto text-lg font-semibold leading-none">Fandocker</h1>
             <Popover><PopoverTrigger asChild><Button className="text-xs" size="sm" variant="outline">フィルタ</Button></PopoverTrigger>
-              <PopoverContent align="start" className="w-72 space-y-3">
+              <PopoverContent align="start" className="w-72 gap-3 p-2">
                 <div className="space-y-1.5"><Label>タグ付け状態</Label><Choice label="タグ付け状態で絞り込み" value={filter} onValueChange={setFilter} options={[{value:'all',label:'すべて'},{value:'untagged',label:`未タグ付け ${files.length-tagged}`},{value:'tagged',label:`タグ付け済み ${tagged}`}]} /></div>
                 <div className="space-y-1.5"><Label>作品</Label><Choice label="作品で絞り込み" value={workFilter} onValueChange={v => {setWorkFilter(v);setCharacterFilter('')}} options={[{value:'',label:'全作品'},...works.map(t=>({value:t.id,label:t.name}))]} /></div>
                 <div className="space-y-1.5"><Label>タグ</Label><Choice label="タグで絞り込み" value={characterFilter} disabled={!workFilter} onValueChange={setCharacterFilter} options={[{value:'',label:'全タグ'},...doc.tags.filter(t=>t.parent===workFilter).map(t=>({value:t.id,label:t.name}))]} /></div>
               </PopoverContent>
             </Popover>
             <Popover><PopoverTrigger asChild><Button className="text-xs" size="sm" variant="outline">表示</Button></PopoverTrigger>
-              <PopoverContent align="end" className="w-72 space-y-5">
+              <PopoverContent align="end" className="w-72 gap-3 p-2">
                 <div className="space-y-1.5"><Label>並び順</Label><ButtonGroup className="w-full min-w-0" aria-label="ソート">
               <Choice label="並び順" value={sort.split('-')[0]} onValueChange={v=>setSort(`${v}-${sort.split('-')[1]}`)} options={[{value:'name',label:'ファイル名'},{value:'modified',label:'更新日時'},{value:'created',label:'作成日時'}]} className="flex-1 pr-3" />
               <Button className="text-xs" variant="outline" size="icon" aria-label={sort.endsWith('-asc')?'昇順（クリックで降順）':'降順（クリックで昇順）'} onClick={()=>setSort(`${sort.split('-')[0]}-${sort.endsWith('-asc')?'desc':'asc'}`)}>{sort.endsWith('-asc')?<ArrowUp />:<ArrowDown />}</Button>
@@ -229,7 +229,7 @@ export default function App() {
               </PopoverContent>
             </Popover>
         <Popover><PopoverTrigger asChild><Button className="text-xs" size="sm" variant="outline">フォルダー<ChevronDown /></Button></PopoverTrigger>
-          <PopoverContent align="end" className="w-56 space-y-1 p-1">
+          <PopoverContent align="end" className="w-56 gap-1 p-1">
             <Button className="w-full justify-start" variant="ghost" disabled={!boot || boot.folderMissing} onClick={openFolder}><ExternalLink />エクスプローラーで開く</Button>
             <Button className="w-full justify-start" variant="ghost" disabled={status !== '保存済み' || choosingFolder} onClick={selectFolder}><ArrowLeftRight />フォルダーを切り替え</Button>
           </PopoverContent>
