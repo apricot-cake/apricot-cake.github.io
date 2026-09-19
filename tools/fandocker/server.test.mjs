@@ -72,6 +72,22 @@ test('現在の画像フォルダーを開ける', async () => {
   } finally { await new Promise(resolve=>server.close(resolve)); await rm(temp,{recursive:true,force:true}); }
 });
 
+test('選択した画像をエクスプローラーで表示できる', async () => {
+  const temp=await mkdtemp(path.join(os.tmpdir(),'tagger-reveal-'));
+  await writeFile(path.join(temp,'sample.png'),'image');
+  let revealed='';
+  const server=await startServer({folder:temp,port:0,revealImage:async file=>{revealed=file}});
+  const base=`http://127.0.0.1:${server.address().port}`;
+  try {
+    const boot=await (await fetch(base+'/api/state')).json();
+    const request=(body, headers={})=>fetch(base+'/api/reveal-image',{method:'POST',headers:{'X-Tagger-Context':boot.context,'Content-Type':'application/json',...headers},body:JSON.stringify(body)});
+    assert.equal((await request({file:'sample.png'})).status,204);
+    assert.equal(revealed,path.join(temp,'sample.png'));
+    assert.equal((await request({file:'other.png'})).status,404);
+    assert.equal((await fetch(base+'/api/reveal-image',{method:'POST',headers:{'X-Tagger-Context':boot.context}})).status,415);
+  } finally { await new Promise(resolve=>server.close(resolve)); await rm(temp,{recursive:true,force:true}); }
+});
+
 test('画像フォルダーがなくても起動し、別のフォルダーを選択できる', async () => {
   const temp=await mkdtemp(path.join(os.tmpdir(),'tagger-missing-'));
   const missing=path.join(temp,'missing'), selected=path.join(temp,'selected');

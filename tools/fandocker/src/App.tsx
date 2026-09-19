@@ -128,6 +128,13 @@ export default function App() {
       if (!response.ok) throw Error((await response.json()).error || 'フォルダーを開けませんでした')
     } catch(e) { setError((e as Error).message) }
   }
+  async function revealActiveImage() {
+    if (!active) return
+    try {
+      const response = await fetch('/api/reveal-image', {method:'POST',headers:{'Content-Type':'application/json','X-Tagger-Context':context.current},body:JSON.stringify({file:active})})
+      if (!response.ok) throw Error((await response.json()).error || '画像をエクスプローラーで表示できませんでした')
+    } catch(e) { setError((e as Error).message) }
+  }
   function commit(next: Catalog) {
     if (!doc || serialize(next) === serialize(doc)) return
     setFuture([]); setHistory(h => [...h.slice(-49), doc]); latest.current = next; setDoc(next); setStatus('未保存')
@@ -283,7 +290,7 @@ export default function App() {
               <span className="truncate">{active||'画像を選択'}</span>
               <ShortcutTooltip label="Enter"><Button variant="ghost" size="icon-sm"  aria-label="次の画像" onClick={()=>navigate(1)} disabled={!visible.length}><ArrowRight /></Button></ShortcutTooltip>
             </div>
-            {active?<Button variant="ghost" onClick={()=>setZoom(true)} aria-label="画像を拡大" className="relative h-[260px] w-full bg-white p-2 hover:bg-white active:translate-y-0 min-[1500px]:h-[330px]"><img src={imageUrl(active,boot.context)} alt={active} className="absolute inset-0 size-full object-contain" /></Button>:<p className="py-20 text-center text-sm text-muted-foreground">画像を選択してください</p>}
+            {active?<><Button variant="ghost" onClick={()=>setZoom(true)} aria-label="画像を拡大" className="relative h-[260px] w-full bg-white p-2 hover:bg-white active:translate-y-0 min-[1500px]:h-[330px]"><img src={imageUrl(active,boot.context)} alt={active} className="absolute inset-0 size-full object-contain" /></Button><Button variant="outline" size="sm" className="mt-2 w-full" onClick={revealActiveImage}><ExternalLink />エクスプローラーで表示</Button></>:<p className="py-20 text-center text-sm text-muted-foreground">画像を選択してください</p>}
             </>}
             <div className="mt-5 flex min-h-8 flex-wrap items-center gap-1.5">
               {selectedTags.map(t=><Button key={t.id} variant="secondary" size="sm" onClick={()=>removeTag(t.id)} title="選択した画像から外す" className="h-auto max-w-full whitespace-normal py-1.5 text-xs">{t.parent&&<span className="text-muted-foreground">{works.find(w=>w.id===t.parent)?.name} /</span>}{t.name}{selected.length>1&&<span className="text-muted-foreground">{selected.filter(f=>doc.images[f]?.includes(t.id)).length}/{selected.length}</span>}<X className="size-3" /></Button>)}

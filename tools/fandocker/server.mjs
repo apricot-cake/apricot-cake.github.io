@@ -9,7 +9,7 @@ import { randomUUID } from 'node:crypto';
 import { parse, stringify } from 'yaml';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Users/apricot/local/media/描いた絵/upload', dataDir = process.env.TAGGER_DATA || folder, port = Number(process.env.PORT || 4317), dev = false, chooseFolder = pickFolder, openFolder = directory => spawn('explorer.exe', [directory], { detached: true, stdio: 'ignore' }).unref() } = {}) {
+export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Users/apricot/local/media/描いた絵/upload', dataDir = process.env.TAGGER_DATA || folder, port = Number(process.env.PORT || 4317), dev = false, chooseFolder = pickFolder, openFolder = directory => spawn('explorer.exe', [directory], { detached: true, stdio: 'ignore' }).unref(), revealImage = file => spawn('explorer.exe', ['/select,', file], { detached: true, stdio: 'ignore' }).unref() } = {}) {
   folder = path.resolve(folder);
   dataDir = path.resolve(dataDir);
   let folderMissing = false;
@@ -94,6 +94,15 @@ export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Us
       if (url.pathname === '/api/open-folder' && req.method === 'POST') {
         if (req.headers['x-tagger-context'] !== context) return send(res,409,{error:'フォルダーが変更されています。再読み込みしてください。'});
         await openFolder(folder);
+        return send(res,204,{});
+      }
+      if (url.pathname === '/api/reveal-image' && req.method === 'POST') {
+        if (req.headers['x-tagger-context'] !== context) return send(res,409,{error:'フォルダーが変更されています。再読み込みしてください。'});
+        if (!req.headers['content-type']?.startsWith('application/json')) return send(res,415,{error:'JSONが必要です'});
+        let body = ''; for await(const chunk of req) { body += chunk; if(Buffer.byteLength(body)>10_000) return send(res,413,{error:'データが大きすぎます'}); }
+        let file; try { file=JSON.parse(body).file; } catch { return send(res,400,{error:'内容を読み取れませんでした'}); }
+        if (typeof file !== 'string' || !fileSet.has(file)) return send(res,404,{error:'画像がありません'});
+        await revealImage(path.join(folder,file));
         return send(res,204,{});
       }
       if (url.pathname === '/api/state' && req.method === 'PUT') {
