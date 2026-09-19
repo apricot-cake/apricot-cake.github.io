@@ -30,7 +30,7 @@ function readView(): { sort: string; filter: string; workFilter: string; charact
   } catch { return { sort: 'name-asc', filter: 'all', workFilter: '', characterFilter: '', thumbnailSize: 125 } }
 }
 function ShortcutTooltip({ label, children }: { label: string; children: React.ReactElement }) {
-  return <Tooltip.Provider delayDuration={300}><Tooltip.Root><Tooltip.Trigger asChild onFocus={e=>e.preventDefault()}>{children}</Tooltip.Trigger><Tooltip.Portal><Tooltip.Content side="bottom" sideOffset={6} className="z-50 flex items-center gap-1.5 rounded-md bg-neutral-700 px-2 py-1.5 text-[11px] text-white shadow-md"><span>Press</span><kbd className="inline-flex h-5 min-w-5 items-center justify-center rounded border border-white/40 bg-white/10 px-1.5 py-0.5 font-sans text-[11px] leading-none shadow-[0_1px_0_0_rgba(255,255,255,0.25)]">{label}</kbd><Tooltip.Arrow className="fill-neutral-700" /></Tooltip.Content></Tooltip.Portal></Tooltip.Root></Tooltip.Provider>
+  return <Tooltip.Provider delayDuration={300}><Tooltip.Root><Tooltip.Trigger asChild onFocus={e=>e.preventDefault()}><span className="inline-flex">{children}</span></Tooltip.Trigger><Tooltip.Portal><Tooltip.Content side="bottom" sideOffset={6} className="z-50 flex items-center gap-1.5 rounded-md bg-neutral-700 px-2 py-1.5 text-[11px] text-white shadow-md"><span>Press</span><kbd className="inline-flex h-5 min-w-5 items-center justify-center rounded border border-white/40 bg-white/10 px-1.5 py-0.5 font-sans text-[11px] leading-none shadow-[0_1px_0_0_rgba(255,255,255,0.25)]">{label}</kbd><Tooltip.Arrow className="fill-neutral-700" /></Tooltip.Content></Tooltip.Portal></Tooltip.Root></Tooltip.Provider>
 }
 export default function App() {
   const [initialView] = useState(readView)
@@ -236,8 +236,8 @@ export default function App() {
         </Popover>
 
         <div role="group" aria-label="操作履歴" className="flex items-center gap-1.5">
-          <Button className="text-xs" size="sm" variant="outline" disabled={!history.length} onClick={undo}><Undo2 />取り消す</Button>
-          <Button className="text-xs" size="sm" variant="outline" disabled={!future.length} onClick={redo}><Redo2 />やり直す</Button>
+          <ShortcutTooltip label="Ctrl + Z"><Button className="text-xs" size="sm" variant="outline" disabled={!history.length} onClick={undo}><Undo2 />取り消す</Button></ShortcutTooltip>
+          <ShortcutTooltip label="Ctrl + Shift + Z / Ctrl + Y"><Button className="text-xs" size="sm" variant="outline" disabled={!future.length} onClick={redo}><Redo2 />やり直す</Button></ShortcutTooltip>
         </div>
         <span role="status" className="flex items-center gap-1.5 text-xs text-muted-foreground"><span className={cn('size-1.5 rounded-full bg-neutral-400', status === '保存済み' && 'bg-[#328455]')} />{status}</span>
           </div>
