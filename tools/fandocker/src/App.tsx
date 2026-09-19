@@ -33,7 +33,7 @@ function ShortcutTooltip({ label, children }: { label: string; children: React.R
   return <Tooltip.Provider delayDuration={300}><Tooltip.Root><Tooltip.Trigger asChild onFocus={e=>e.preventDefault()}><span className="inline-flex">{children}</span></Tooltip.Trigger><Tooltip.Portal><Tooltip.Content side="bottom" sideOffset={6} className="z-50 flex items-center gap-1.5 rounded-md bg-neutral-700 px-2 py-1.5 text-[11px] text-white shadow-md"><span>Press</span><kbd className="inline-flex h-5 min-w-5 items-center justify-center rounded border border-white/40 bg-white/10 px-1.5 py-0.5 font-sans text-[11px] leading-none shadow-[0_1px_0_0_rgba(255,255,255,0.25)]">{label}</kbd><Tooltip.Arrow className="fill-neutral-700" /></Tooltip.Content></Tooltip.Portal></Tooltip.Root></Tooltip.Provider>
 }
 function SettingsMenuContent({ align, children }: { align: 'start' | 'end'; children: React.ReactNode }) {
-  return <PopoverContent align={align} className="w-72 gap-4 p-3">{children}</PopoverContent>
+  return <PopoverContent align={align} className="w-72 gap-4 p-4">{children}</PopoverContent>
 }
 export default function App() {
   const [initialView] = useState(readView)
