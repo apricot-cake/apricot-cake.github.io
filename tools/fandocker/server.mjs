@@ -9,7 +9,7 @@ import { randomUUID } from 'node:crypto';
 import { parse, stringify } from 'yaml';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Users/apricot/local/media/描いた絵/upload', dataDir = process.env.TAGGER_DATA || folder, port = Number(process.env.PORT || 4317), dev = false, chooseFolder = pickFolder, openFolder = directory => spawn('explorer.exe', [directory], { windowsHide: true, detached: true, stdio: 'ignore' }).unref() } = {}) {
+export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Users/apricot/local/media/描いた絵/upload', dataDir = process.env.TAGGER_DATA || folder, port = Number(process.env.PORT || 4317), dev = false, chooseFolder = pickFolder, openFolder = directory => spawn('explorer.exe', [directory], { detached: true, stdio: 'ignore' }).unref() } = {}) {
   folder = path.resolve(folder);
   dataDir = path.resolve(dataDir);
   let folderMissing = false;
