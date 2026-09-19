@@ -269,7 +269,7 @@ export default function App() {
             <Button className="w-full justify-start" variant="ghost" disabled={status !== '保存済み' || choosingFolder} onClick={selectFolder}><ArrowLeftRight />フォルダーを切り替え</Button>
           </PopoverContent>
         </Popover>
-        <Button className="min-w-20 text-xs" size="sm" variant="outline" disabled={!boot} onClick={refreshImages}>{refreshed ? <Check /> : <RefreshCw />}{refreshed ? '更新済み' : '更新'}</Button>
+        <Button className="text-xs" size="sm" variant="outline" disabled={!boot} onClick={refreshImages}>{refreshed ? <Check /> : <RefreshCw />}{refreshed ? '更新済み' : '更新'}</Button>
 
         <div role="group" aria-label="操作履歴" className="flex items-center gap-1.5">
           <ShortcutTooltip label="Ctrl + Z"><Button className="text-xs" size="sm" variant="outline" disabled={!history.length} onClick={undo}><Undo2 />取り消す</Button></ShortcutTooltip>
