@@ -228,7 +228,7 @@ export default function App() {
                 <div className="space-y-2"><Label htmlFor="thumbnail-size">サムネイルサイズ</Label><Slider id="thumbnail-size" aria-label="サムネイルサイズ" min={80} max={280} step={5} value={[thumbnailSize]} onValueChange={v=>setThumbnailSize(v[0])} /></div>
               </PopoverContent>
             </Popover>
-        <Popover><PopoverTrigger asChild><Button className="text-xs" size="sm" variant="outline">フォルダー<ChevronDown /></Button></PopoverTrigger>
+        <Popover><PopoverTrigger asChild><Button className="text-xs" size="sm" variant="outline">フォルダー</Button></PopoverTrigger>
           <PopoverContent align="end" className="w-56 gap-1 p-1">
             <Button className="w-full justify-start" variant="ghost" disabled={!boot || boot.folderMissing} onClick={openFolder}><ExternalLink />エクスプローラーで開く</Button>
             <Button className="w-full justify-start" variant="ghost" disabled={status !== '保存済み' || choosingFolder} onClick={selectFolder}><ArrowLeftRight />フォルダーを切り替え</Button>
