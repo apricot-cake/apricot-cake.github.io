@@ -8,7 +8,7 @@ const blog = defineCollection({
 	schema: ({ image }) =>
 		z.object({
 			title: z.string(),
-			category: z.enum(['apps']),
+		filterPath: z.array(z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)).min(1),
 			description: z.string().optional(),
 			cardUrl: z.string().url().optional(),
 			cardLinkLabel: z.string().optional(),
@@ -19,9 +19,4 @@ const blog = defineCollection({
 		}),
 });
 
-const pages = defineCollection({
-	loader: glob({ base: './content/pages', pattern: '**/*.{md,mdx}' }),
-	schema: z.object({ title: z.string() }),
-});
-
-export const collections = { blog, pages };
+export const collections = { blog };

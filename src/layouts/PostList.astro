@@ -6,24 +6,26 @@ import CategoryNav from '../components/CategoryNav.astro';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import { filterTree, getFilterLabel } from '../filter-tree';
 import { SITE_TITLE } from '../consts';
-interface Props { posts: CollectionEntry<'blog'>[]; category?: 'apps'; }
-const { posts, category } = Astro.props;
+interface Props { posts: CollectionEntry<'blog'>[]; selectedPath?: string[]; }
+const { posts, selectedPath = [] } = Astro.props;
+const selectedLabel = getFilterLabel(selectedPath);
 ---
 <!doctype html>
 <html lang="ja">
- <head><BaseHead title={category ? 'アプリ | ' + SITE_TITLE : SITE_TITLE} /></head>
+ <head><BaseHead title={selectedLabel ? `${selectedLabel} | ${SITE_TITLE}` : SITE_TITLE} /></head>
  <body>
   <Header />
   <main id="main" class="mx-auto grid w-full max-w-[1200px] grid-cols-[132px_minmax(0,1fr)] content-start gap-12 px-8 pt-16 pb-24 max-[901px]:grid-cols-[108px_minmax(0,1fr)] max-[901px]:gap-8 max-[721px]:grid-cols-1 max-[721px]:px-5 max-[721px]:pt-8 max-[721px]:pb-16">
-   <h1 class="sr-only">{category ? 'アプリ' : SITE_TITLE}</h1>
-   <aside><CategoryNav selected={category} /></aside>
-   <section aria-label={category ? 'アプリの記事' : 'すべての記事'}>
+   <h1 class="sr-only">{selectedLabel ?? SITE_TITLE}</h1>
+   <aside><CategoryNav selectedPath={selectedPath} tree={filterTree} siteTitle={SITE_TITLE} /></aside>
+   <section aria-label={selectedLabel ? `${selectedLabel}の記事` : 'すべての記事'} data-filter-results>
     <ul class="m-0 grid list-none grid-cols-2 gap-x-6 gap-y-10 p-0 max-[521px]:grid-cols-1 max-[521px]:gap-8">
-     {posts.map(post => <li>
-      <a class="group block no-underline" href={post.data.cardUrl ?? '/blog/' + post.id + '/'}>
+     {posts.map(post => <li data-filter-card data-filter-path={post.data.filterPath.join('/')}>
+      <a class="group block no-underline" href={post.data.cardUrl ?? '/blog/' + post.id}>
        {post.data.heroImage && <div class="overflow-hidden rounded-lg bg-surface"><Image class="w-full transition-opacity duration-[180ms] ease-[ease] group-hover:opacity-85" src={post.data.heroImage} width={800} alt="" /></div>}
-       <h2 class="mt-4 flex items-center gap-1 text-base leading-[1.3] font-bold tracking-[-0.025em]">{post.data.title}{post.data.cardUrl && <><ExternalLink class="size-3.5 text-muted" aria-hidden="true" /><span class="sr-only">（{post.data.cardLinkLabel ?? '外部サイトで開く'}）</span></>}</h2>
+       <h2 class="mt-4 flex items-center gap-3 text-base leading-[1.3] font-bold tracking-[0.03em] text-slate-600">{post.data.title}{post.data.cardUrl && <><ExternalLink class="size-3.5 text-muted" aria-hidden="true" /><span class="sr-only">（{post.data.cardLinkLabel ?? '外部サイトで開く'}）</span></>}</h2>
        {post.data.description && <p class="mt-2 text-sm leading-[1.6] text-muted">{post.data.description}</p>}
       </a>
      </li>)}
@@ -31,5 +33,42 @@ const { posts, category } = Astro.props;
    </section>
   </main>
   <Footer />
+  <script>
+   const nav = document.querySelector<HTMLElement>('[data-filter-nav]');
+   const results = document.querySelector<HTMLElement>('[data-filter-results]');
+   const cards = Array.from(document.querySelectorAll<HTMLElement>('[data-filter-card]'));
+
+   if (nav && results) {
+    const links = Array.from(nav.querySelectorAll<HTMLAnchorElement>('[data-filter-link]'));
+    const siteTitle = nav.dataset.filterSiteTitle ?? document.title;
+
+    const pathFromLocation = () => window.location.pathname.split('/').filter(Boolean).join('/');
+    const matchesPath = (cardPath: string, filterPath: string) => !filterPath || cardPath === filterPath || cardPath.startsWith(`${filterPath}/`);
+
+    const applyFilter = (filterPath: string) => {
+     const selectedLink = links.find((link) => link.dataset.filterPath === filterPath);
+     const label = selectedLink?.dataset.filterLabel ?? 'すべて';
+
+     for (const card of cards) card.hidden = !matchesPath(card.dataset.filterPath ?? '', filterPath);
+     for (const link of links) link.toggleAttribute('aria-current', link === selectedLink);
+
+     document.title = filterPath ? `${label} | ${siteTitle}` : siteTitle;
+     results.setAttribute('aria-label', filterPath ? `${label}の記事` : 'すべての記事');
+    };
+
+    nav.addEventListener('click', (event) => {
+     if (!(event.target instanceof Element)) return;
+     const link = event.target.closest<HTMLAnchorElement>('[data-filter-link]');
+     if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+     event.preventDefault();
+     history.pushState({}, '', link.href);
+     applyFilter(link.dataset.filterPath ?? '');
+    });
+
+    window.addEventListener('popstate', () => applyFilter(pathFromLocation()));
+    applyFilter(pathFromLocation());
+   }
+  </script>
  </body>
 </html>

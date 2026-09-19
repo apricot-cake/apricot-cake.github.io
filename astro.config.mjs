@@ -5,7 +5,11 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
- site: 'https://apricot-cake.github.io',
+	site: 'https://apricot-cake.github.io',
+	trailingSlash: 'never',
+	redirects: {
+		'/categories/apps': '/apps',
+	},
  integrations: [mdx(), sitemap()],
  vite: { plugins: [tailwindcss()] },
 });
