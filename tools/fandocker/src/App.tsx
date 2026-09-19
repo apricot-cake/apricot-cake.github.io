@@ -68,12 +68,13 @@ export default function App() {
   const revision = useRef(0)
   const inFlight = useRef(false)
   const failed = useRef(false)
+  const pendingInitialSelection = useRef(true)
   const serialize = (d: Catalog) => JSON.stringify({ tags: d.tags, images: d.images })
 
   useEffect(() => {
     let cancelled = false
     fetch('/api/state').then(async r => { if (!r.ok) throw Error('読み込めませんでした'); return r.json() as Promise<Boot> })
-      .then(b => { if (cancelled) return; context.current = b.context; setBoot(b); setWorkFilter(current => b.document.tags.some(t => t.id === current && !t.parent) ? current : ''); setCharacterFilter(current => b.document.tags.some(t => t.id === current && t.parent === initialView.workFilter) ? current : ''); setDoc(b.document); latest.current = b.document; revision.current = b.document.revision; saved.current = serialize(b.document); setStatus('保存済み'); if (b.files[0]) { setActive(b.files[0]); setSelected([b.files[0]]) } })
+      .then(b => { if (cancelled) return; pendingInitialSelection.current=true; context.current = b.context; setBoot(b); setWorkFilter(current => b.document.tags.some(t => t.id === current && !t.parent) ? current : ''); setCharacterFilter(current => b.document.tags.some(t => t.id === current && t.parent === initialView.workFilter) ? current : ''); setDoc(b.document); latest.current = b.document; revision.current = b.document.revision; saved.current = serialize(b.document); setStatus('保存済み') })
       .catch(e => { if (!cancelled) setError(e.message) })
     return () => { cancelled = true }
   }, [initialView.workFilter])
@@ -116,7 +117,7 @@ export default function App() {
       context.current=b.context; setBoot(b); setDoc(b.document); latest.current=b.document
       revision.current=b.document.revision; saved.current=serialize(b.document)
       setHistory([]); setFuture([]); setWork(''); setWorkFilter(''); setCharacterFilter(''); setFilter('all')
-      setWorkQuery(''); setWorkOpen(false); setTagQuery(''); setActive(b.files[0] || ''); setSelected(b.files[0] ? [b.files[0]] : [])
+      pendingInitialSelection.current=true; setWorkQuery(''); setWorkOpen(false); setTagQuery(''); setActive(''); setSelected([])
       failed.current=false; setError(''); setStatus('保存済み')
     } catch(e) { setError((e as Error).message) }
     finally { setChoosingFolder(false) }
@@ -156,6 +157,13 @@ export default function App() {
   const effectiveTags = (file: string) => doc?.images[file] || []
   const visible = files.filter(file => (filter !== 'untagged' || !classified(file)) && (filter !== 'tagged' || classified(file)) && (!characterFilter || effectiveTags(file).includes(characterFilter)) && (!workFilter || hasTag(effectiveTags(file), workFilter, doc?.tags || [])))
   const hasActiveFilters = filter !== 'all' || !!workFilter || !!characterFilter
+
+  useEffect(() => {
+    if (!boot || !doc || !pendingInitialSelection.current) return
+    pendingInitialSelection.current=false
+    const file=visible[0] || ''
+    setActive(file); setSelected(file ? [file] : [])
+  }, [boot, doc, visible])
 
   const tagged = files.filter(classified).length
   const selectedTags = doc ? doc.tags.filter(t => selected.some(f => doc.images[f]?.includes(t.id))) : []
