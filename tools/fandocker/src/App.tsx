@@ -244,7 +244,7 @@ export default function App() {
         <div ref={menuRef} data-testid="menu-bar" className={cn("absolute inset-x-0 top-0 z-20 p-3 md:px-6 transition-colors", scrolled ? "bg-white/70 backdrop-blur-md" : "bg-white")}>
           <div className="flex flex-wrap items-center justify-end gap-2" data-testid="filters">
             <h1 className="mr-auto text-lg font-semibold leading-none">Fandocker</h1>
-            <Popover><PopoverTrigger asChild><Button className="relative text-xs" size="sm" variant="outline" aria-label={hasActiveFilters ? 'フィルタ（適用中）' : 'フィルタ'}><ListFilter />フィルタ{hasActiveFilters && <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-primary" aria-hidden="true" />}</Button></PopoverTrigger>
+            <Popover><PopoverTrigger asChild><Button className="relative text-xs" size="sm" variant="outline" aria-label={hasActiveFilters ? 'フィルタ（適用中）' : 'フィルタ'}><ListFilter />フィルタ{hasActiveFilters && <span className="absolute -right-1 -top-1 size-2 rounded-full bg-primary ring-2 ring-background" aria-hidden="true" />}</Button></PopoverTrigger>
               <PopoverContent align="start" className="w-72 gap-3 p-2">
                 <div className="space-y-1.5"><Label>タグ付け状態</Label><Choice label="タグ付け状態で絞り込み" value={filter} onValueChange={setFilter} options={[{value:'all',label:'すべて'},{value:'untagged',label:`未タグ付け ${files.length-tagged}`},{value:'tagged',label:`タグ付け済み ${tagged}`}]} /></div>
                 <div className="space-y-1.5"><Label>作品</Label><Choice label="作品で絞り込み" value={workFilter} onValueChange={v => {setWorkFilter(v);setCharacterFilter('')}} options={[{value:'',label:'全作品'},...works.map(t=>({value:t.id,label:t.name}))]} /></div>
