@@ -2,13 +2,14 @@ import { pickFolder } from './folder-picker.mjs';
 import { createServer } from 'node:http';
 import { readFile, writeFile, rename, mkdir, readdir, copyFile, stat } from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
+import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { parse, stringify } from 'yaml';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
-export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Users/apricot/local/media/描いた絵/upload', dataDir = process.env.TAGGER_DATA || folder, port = Number(process.env.PORT || 4317), dev = false, chooseFolder = pickFolder } = {}) {
+export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Users/apricot/local/media/描いた絵/upload', dataDir = process.env.TAGGER_DATA || folder, port = Number(process.env.PORT || 4317), dev = false, chooseFolder = pickFolder, openFolder = directory => spawn('explorer.exe', [directory], { windowsHide: true, detached: true, stdio: 'ignore' }).unref() } = {}) {
   folder = path.resolve(folder);
   dataDir = path.resolve(dataDir);
   let files = (await readdir(folder, { withFileTypes: true })).filter(f => f.isFile() && /\.(png|jpe?g|webp|gif|avif)$/i.test(f.name)).map(f => f.name).sort((a,b) => a.localeCompare(b, 'en', {numeric:true}));
@@ -86,6 +87,11 @@ export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Us
           queue=job.catch(()=>{}); await job;
         } finally { picking=false; }
         return;
+      }
+      if (url.pathname === '/api/open-folder' && req.method === 'POST') {
+        if (req.headers['x-tagger-context'] !== context) return send(res,409,{error:'フォルダーが変更されています。再読み込みしてください。'});
+        await openFolder(folder);
+        return send(res,204,{});
       }
       if (url.pathname === '/api/state' && req.method === 'PUT') {
         if (!req.headers['content-type']?.startsWith('application/json')) return send(res,415,{error:'JSONが必要です'});

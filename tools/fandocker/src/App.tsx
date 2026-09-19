@@ -121,6 +121,12 @@ export default function App() {
     } catch(e) { setError((e as Error).message) }
     finally { setChoosingFolder(false) }
   }
+  async function openFolder() {
+    try {
+      const response = await fetch('/api/open-folder', {method:'POST',headers:{'X-Tagger-Context':context.current}})
+      if (!response.ok) throw Error((await response.json()).error || 'フォルダーを開けませんでした')
+    } catch(e) { setError((e as Error).message) }
+  }
   function commit(next: Catalog) {
     if (!doc || serialize(next) === serialize(doc)) return
     setFuture([]); setHistory(h => [...h.slice(-49), doc]); latest.current = next; setDoc(next); setStatus('未保存')
@@ -222,6 +228,7 @@ export default function App() {
                 <div className="space-y-3"><Label htmlFor="thumbnail-size">サムネイルサイズ</Label><Slider id="thumbnail-size" aria-label="サムネイルサイズ" min={80} max={280} step={5} value={[thumbnailSize]} onValueChange={v=>setThumbnailSize(v[0])} /></div>
               </PopoverContent>
             </Popover>
+        <Button className="text-xs" size="sm" variant="outline" disabled={!boot} onClick={openFolder}><FolderOpen />フォルダーを開く</Button>
         <Button className="text-xs" size="sm" variant="outline" disabled={status !== '保存済み' || choosingFolder} onClick={selectFolder}><FolderOpen />フォルダー選択</Button>
 
         <div role="group" aria-label="操作履歴" className="flex items-center gap-1.5">

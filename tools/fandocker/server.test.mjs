@@ -59,6 +59,19 @@ test('フォルダー切り替えは選択先のYAMLを読み、古い画面か�
   } finally { await new Promise(resolve=>server.close(resolve)); await rm(temp,{recursive:true,force:true}); }
 });
 
+test('現在の画像フォルダーを開ける', async () => {
+  const temp=await mkdtemp(path.join(os.tmpdir(),'tagger-open-'));
+  let opened='';
+  const server=await startServer({folder:temp,port:0,openFolder:async directory=>{opened=directory}});
+  const base=`http://127.0.0.1:${server.address().port}`;
+  try {
+    const boot=await (await fetch(base+'/api/state')).json();
+    assert.equal((await fetch(base+'/api/open-folder',{method:'POST',headers:{'X-Tagger-Context':boot.context}})).status,204);
+    assert.equal(opened,temp);
+    assert.equal((await fetch(base+'/api/open-folder',{method:'POST'})).status,409);
+  } finally { await new Promise(resolve=>server.close(resolve)); await rm(temp,{recursive:true,force:true}); }
+});
+
 test('JSONの最新編集をYAMLへ一度だけ移し、移行前データを保持する', async () => {
   const temp=await mkdtemp(path.join(os.tmpdir(),'fandocker-migrate-'));
   const {readdir}=await import('node:fs/promises');
