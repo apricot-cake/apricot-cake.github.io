@@ -200,7 +200,7 @@ export default function App() {
       }
       if (e.key === 'Enter') { e.preventDefault(); navigate(1) }
       if (e.key === 'Backspace') { e.preventDefault(); navigate(-1) }
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); if (e.shiftKey) redo(); else undo() }
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z') { e.preventDefault(); undo() }
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); redo() }
     }
     window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey)
@@ -237,7 +237,7 @@ export default function App() {
 
         <div role="group" aria-label="操作履歴" className="flex items-center gap-1.5">
           <ShortcutTooltip label="Ctrl + Z"><Button className="text-xs" size="sm" variant="outline" disabled={!history.length} onClick={undo}><Undo2 />取り消す</Button></ShortcutTooltip>
-          <ShortcutTooltip label="Ctrl + Shift + Z / Ctrl + Y"><Button className="text-xs" size="sm" variant="outline" disabled={!future.length} onClick={redo}><Redo2 />やり直す</Button></ShortcutTooltip>
+          <ShortcutTooltip label="Ctrl + Y"><Button className="text-xs" size="sm" variant="outline" disabled={!future.length} onClick={redo}><Redo2 />やり直す</Button></ShortcutTooltip>
         </div>
         <span role="status" className="flex items-center gap-1.5 text-xs text-muted-foreground"><span className={cn('size-1.5 rounded-full bg-neutral-400', status === '保存済み' && 'bg-[#328455]')} />{status}</span>
           </div>
