@@ -220,12 +220,12 @@ export default function App() {
               </PopoverContent>
             </Popover>
             <Popover><PopoverTrigger asChild><Button className="text-xs" size="sm" variant="outline">表示</Button></PopoverTrigger>
-              <PopoverContent align="end" className="w-72 gap-3 p-2">
-                <div className="space-y-1.5"><Label>並び順</Label><ButtonGroup className="w-full min-w-0" aria-label="ソート">
+              <PopoverContent align="end" className="w-72 gap-4 p-3">
+                <div className="space-y-2"><Label>並び順</Label><ButtonGroup className="w-full min-w-0" aria-label="ソート">
               <Choice label="並び順" value={sort.split('-')[0]} onValueChange={v=>setSort(`${v}-${sort.split('-')[1]}`)} options={[{value:'name',label:'ファイル名'},{value:'modified',label:'更新日時'},{value:'created',label:'作成日時'}]} className="flex-1 pr-3" />
               <Button className="text-xs" variant="outline" size="icon" aria-label={sort.endsWith('-asc')?'昇順（クリックで降順）':'降順（クリックで昇順）'} onClick={()=>setSort(`${sort.split('-')[0]}-${sort.endsWith('-asc')?'desc':'asc'}`)}>{sort.endsWith('-asc')?<ArrowUp />:<ArrowDown />}</Button>
             </ButtonGroup></div>
-                <div className="space-y-3"><Label htmlFor="thumbnail-size">サムネイルサイズ</Label><Slider id="thumbnail-size" aria-label="サムネイルサイズ" min={80} max={280} step={5} value={[thumbnailSize]} onValueChange={v=>setThumbnailSize(v[0])} /></div>
+                <div className="space-y-2"><Label htmlFor="thumbnail-size">サムネイルサイズ</Label><Slider id="thumbnail-size" aria-label="サムネイルサイズ" min={80} max={280} step={5} value={[thumbnailSize]} onValueChange={v=>setThumbnailSize(v[0])} /></div>
               </PopoverContent>
             </Popover>
         <Popover><PopoverTrigger asChild><Button className="text-xs" size="sm" variant="outline">フォルダー<ChevronDown /></Button></PopoverTrigger>
