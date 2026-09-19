@@ -62,6 +62,7 @@ export default function App() {
   const [future, setFuture] = useState<Catalog[]>([])
   const [zoom, setZoom] = useState(false)
   const [choosingFolder, setChoosingFolder] = useState(false)
+  const [refreshed, setRefreshed] = useState(false)
   const context = useRef('')
   const latest = useRef<Catalog | null>(null)
   const saved = useRef('')
@@ -69,6 +70,7 @@ export default function App() {
   const inFlight = useRef(false)
   const failed = useRef(false)
   const pendingInitialSelection = useRef(true)
+  const refreshNoticeTimer = useRef<number | undefined>(undefined)
   const serialize = (d: Catalog) => JSON.stringify({ tags: d.tags, images: d.images })
 
   useEffect(() => {
@@ -144,6 +146,9 @@ export default function App() {
       setBoot(current => current ? {...current,files:b.files,dates:b.dates,folderMissing:b.folderMissing} : current)
       setSelected(current => current.filter(file => b.files.includes(file)))
       setActive(current => b.files.includes(current) ? current : '')
+      window.clearTimeout(refreshNoticeTimer.current)
+      setRefreshed(true)
+      refreshNoticeTimer.current = window.setTimeout(() => setRefreshed(false), 2000)
     } catch(e) { setError((e as Error).message) }
   }
   function commit(next: Catalog) {
@@ -261,7 +266,7 @@ export default function App() {
             <Button className="w-full justify-start" variant="ghost" disabled={status !== '保存済み' || choosingFolder} onClick={selectFolder}><ArrowLeftRight />フォルダーを切り替え</Button>
           </PopoverContent>
         </Popover>
-        <Button className="text-xs" size="sm" variant="outline" disabled={!boot} onClick={refreshImages}><RefreshCw />更新</Button>
+        <Button className="min-w-20 text-xs" size="sm" variant="outline" disabled={!boot} onClick={refreshImages}>{refreshed ? <Check /> : <RefreshCw />}{refreshed ? '更新済み' : '更新'}</Button>
 
         <div role="group" aria-label="操作履歴" className="flex items-center gap-1.5">
           <ShortcutTooltip label="Ctrl + Z"><Button className="text-xs" size="sm" variant="outline" disabled={!history.length} onClick={undo}><Undo2 />取り消す</Button></ShortcutTooltip>
