@@ -229,7 +229,7 @@ export default function App() {
               </PopoverContent>
             </Popover>
         <Button className="text-xs" size="sm" variant="outline" disabled={!boot || boot.folderMissing} onClick={openFolder}><ExternalLink />エクスプローラーで開く</Button>
-        <Button className="text-xs" size="sm" variant="outline" disabled={status !== '保存済み' || choosingFolder} onClick={selectFolder}><ArrowLeftRight />画像フォルダーを切り替え</Button>
+        <Button className="text-xs" size="sm" variant="outline" disabled={status !== '保存済み' || choosingFolder} onClick={selectFolder}><ArrowLeftRight />フォルダーを切り替え</Button>
 
         <div role="group" aria-label="操作履歴" className="flex items-center gap-1.5">
           <Button className="text-xs" size="sm" variant="outline" disabled={!history.length} onClick={undo}><Undo2 />取り消す</Button>
