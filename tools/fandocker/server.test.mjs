@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import { get } from 'node:http';
 import assert from 'node:assert/strict';
-import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises';
+import { mkdtemp, writeFile, readFile, rm, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import { startServer } from './server.mjs';
@@ -85,6 +85,19 @@ test('選択した画像をエクスプローラーで表示できる', async ()
     assert.equal(revealed,path.join(temp,'sample.png'));
     assert.equal((await request({file:'other.png'})).status,404);
     assert.equal((await fetch(base+'/api/reveal-image',{method:'POST',headers:{'X-Tagger-Context':boot.context}})).status,415);
+  } finally { await new Promise(resolve=>server.close(resolve)); await rm(temp,{recursive:true,force:true}); }
+});
+
+test('ローカルで削除された画像を次回の状態取得に反映する', async () => {
+  const temp=await mkdtemp(path.join(os.tmpdir(),'tagger-refresh-'));
+  await writeFile(path.join(temp,'sample.png'),'image');
+  const server=await startServer({folder:temp,port:0});
+  const base=`http://127.0.0.1:${server.address().port}`;
+  try {
+    assert.deepEqual((await (await fetch(base+'/api/state')).json()).files,['sample.png']);
+    await unlink(path.join(temp,'sample.png'));
+    const refreshed=await (await fetch(base+'/api/state')).json();
+    assert.deepEqual(refreshed.files,[]);
   } finally { await new Promise(resolve=>server.close(resolve)); await rm(temp,{recursive:true,force:true}); }
 });
 

@@ -11,7 +11,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Choice } from '@/components/choice'
-import { ChevronDown, ArrowDown, ArrowUp, ArrowLeft, ArrowRight, ArrowLeftRight, ExternalLink, Undo2, Redo2, X, Check, LoaderCircle } from 'lucide-react'
+import { ChevronDown, ArrowDown, ArrowUp, ArrowLeft, ArrowRight, ArrowLeftRight, ExternalLink, RefreshCw, Undo2, Redo2, X, Check, LoaderCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { hasTag, imageUrl } from './model'
@@ -135,6 +135,17 @@ export default function App() {
       if (!response.ok) throw Error((await response.json()).error || '画像をエクスプローラーで表示できませんでした')
     } catch(e) { setError((e as Error).message) }
   }
+  async function refreshImages() {
+    try {
+      const response = await fetch('/api/state')
+      if (!response.ok) throw Error('画像一覧を更新できませんでした')
+      const b = await response.json() as Boot
+      if (b.context !== context.current) return
+      setBoot(current => current ? {...current,files:b.files,dates:b.dates,folderMissing:b.folderMissing} : current)
+      setSelected(current => current.filter(file => b.files.includes(file)))
+      setActive(current => b.files.includes(current) ? current : '')
+    } catch(e) { setError((e as Error).message) }
+  }
   function commit(next: Catalog) {
     if (!doc || serialize(next) === serialize(doc)) return
     setFuture([]); setHistory(h => [...h.slice(-49), doc]); latest.current = next; setDoc(next); setStatus('未保存')
@@ -250,6 +261,7 @@ export default function App() {
             <Button className="w-full justify-start" variant="ghost" disabled={status !== '保存済み' || choosingFolder} onClick={selectFolder}><ArrowLeftRight />フォルダーを切り替え</Button>
           </PopoverContent>
         </Popover>
+        <Button className="text-xs" size="sm" variant="outline" disabled={!boot} onClick={refreshImages}><RefreshCw />更新</Button>
 
         <div role="group" aria-label="操作履歴" className="flex items-center gap-1.5">
           <ShortcutTooltip label="Ctrl + Z"><Button className="text-xs" size="sm" variant="outline" disabled={!history.length} onClick={undo}><Undo2 />取り消す</Button></ShortcutTooltip>

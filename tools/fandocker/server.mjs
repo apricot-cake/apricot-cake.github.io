@@ -57,6 +57,22 @@ export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Us
     validate(value);
     return value;
   }
+  async function refreshFiles() {
+    try {
+      const nextFiles = (await readdir(folder, { withFileTypes: true })).filter(f => f.isFile() && /\.(png|jpe?g|webp|gif|avif)$/i.test(f.name)).map(f => f.name).sort((a,b) => a.localeCompare(b, 'en', {numeric:true}));
+      if (nextFiles.length === files.length && nextFiles.every((file,index) => file === files[index])) return;
+      files = nextFiles;
+      dates = await readDates(folder, files);
+      fileSet = new Set(files);
+      folderMissing = false;
+    } catch (e) {
+      if (e.code !== 'ENOENT') throw e;
+      files = [];
+      dates = {};
+      fileSet = new Set();
+      folderMissing = true;
+    }
+  }
   const bootState=()=>({document,files,folder,dataDir,context,dates,folderMissing});
   let context = randomUUID();
   let picking = false;
@@ -70,7 +86,7 @@ export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Us
       if (![`127.0.0.1:${actualPort}`, `localhost:${actualPort}`].includes(host)) return send(res,403,{error:'許可されていない接続です'});
       if(req.headers.origin && ![`http://127.0.0.1:${actualPort}`,`http://localhost:${actualPort}`].includes(req.headers.origin)) return send(res,403,{error:'別のページからの操作はできません'});
       const url = new URL(req.url, `http://${host}`);
-      if (url.pathname === '/api/state' && req.method === 'GET') {await queue;return send(res,200,bootState())}
+      if (url.pathname === '/api/state' && req.method === 'GET') {await queue; await refreshFiles(); return send(res,200,bootState())}
       if (url.pathname === '/api/folder' && req.method === 'POST') {
         if (req.headers['x-tagger-context'] !== context) return send(res,409,{error:'フォルダーが変更されています。再読み込みしてください。'});
         if (picking) return send(res,409,{error:'フォルダー選択中です'});
