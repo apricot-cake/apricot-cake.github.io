@@ -12,11 +12,14 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Users/apricot/local/media/描いた絵/upload', dataDir = process.env.TAGGER_DATA || folder, port = Number(process.env.PORT || 4317), dev = false, chooseFolder = pickFolder, openFolder = directory => spawn('explorer.exe', [directory], { windowsHide: true, detached: true, stdio: 'ignore' }).unref() } = {}) {
   folder = path.resolve(folder);
   dataDir = path.resolve(dataDir);
-  let files = (await readdir(folder, { withFileTypes: true })).filter(f => f.isFile() && /\.(png|jpe?g|webp|gif|avif)$/i.test(f.name)).map(f => f.name).sort((a,b) => a.localeCompare(b, 'en', {numeric:true}));
+  let folderMissing = false;
+  let files;
+  try { files = (await readdir(folder, { withFileTypes: true })).filter(f => f.isFile() && /\.(png|jpe?g|webp|gif|avif)$/i.test(f.name)).map(f => f.name).sort((a,b) => a.localeCompare(b, 'en', {numeric:true})); }
+  catch (e) { if (e.code !== 'ENOENT') throw e; folderMissing = true; files = []; }
   const readDates = async (dir,names) => Object.fromEntries(await Promise.all(names.map(async name => {const info=await stat(path.join(dir,name));return [name,{modified:info.mtimeMs,created:info.birthtimeMs}]})));
   let dates = await readDates(folder,files);
   let fileSet = new Set(files);
-  await mkdir(dataDir, { recursive:true });
+  if (!folderMissing || dataDir !== folder) await mkdir(dataDir, { recursive:true });
   let storePath = path.join(dataDir, 'catalog.yaml');
   let document = await readCatalog(dataDir);
   function validate(doc) {
@@ -54,7 +57,7 @@ export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Us
     validate(value);
     return value;
   }
-  const bootState=()=>({document,files,folder,dataDir,context,dates});
+  const bootState=()=>({document,files,folder,dataDir,context,dates,folderMissing});
   let context = randomUUID();
   let picking = false;
   let vite;
@@ -81,7 +84,7 @@ export async function startServer({ folder = process.env.TAGGER_IMAGES || 'C:/Us
             const nextPath = path.join(nextFolder,'catalog.yaml');
             const next = await readCatalog(nextFolder);
             const nextDates = await readDates(nextFolder,nextFiles);
-            dates=nextDates; folder=nextFolder; dataDir=nextFolder; storePath=nextPath; files=nextFiles; fileSet=new Set(files); document=next; context=randomUUID();
+            dates=nextDates; folder=nextFolder; dataDir=nextFolder; storePath=nextPath; files=nextFiles; fileSet=new Set(files); document=next; folderMissing=false; context=randomUUID();
             send(res,200,bootState());
           });
           queue=job.catch(()=>{}); await job;

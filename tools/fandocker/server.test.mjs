@@ -72,6 +72,21 @@ test('現在の画像フォルダーを開ける', async () => {
   } finally { await new Promise(resolve=>server.close(resolve)); await rm(temp,{recursive:true,force:true}); }
 });
 
+test('画像フォルダーがなくても起動し、別のフォルダーを選択できる', async () => {
+  const temp=await mkdtemp(path.join(os.tmpdir(),'tagger-missing-'));
+  const missing=path.join(temp,'missing'), selected=path.join(temp,'selected');
+  const {mkdir}=await import('node:fs/promises');
+  await mkdir(selected); await writeFile(path.join(selected,'sample.png'),'image');
+  const server=await startServer({folder:missing,port:0,chooseFolder:async()=>selected});
+  const base=`http://127.0.0.1:${server.address().port}`;
+  try {
+    const boot=await (await fetch(base+'/api/state')).json();
+    assert.equal(boot.folderMissing,true); assert.deepEqual(boot.files,[]);
+    const switched=await (await fetch(base+'/api/folder',{method:'POST',headers:{'X-Tagger-Context':boot.context}})).json();
+    assert.equal(switched.folderMissing,false); assert.deepEqual(switched.files,['sample.png']);
+  } finally { await new Promise(resolve=>server.close(resolve)); await rm(temp,{recursive:true,force:true}); }
+});
+
 test('JSONの最新編集をYAMLへ一度だけ移し、移行前データを保持する', async () => {
   const temp=await mkdtemp(path.join(os.tmpdir(),'fandocker-migrate-'));
   const {readdir}=await import('node:fs/promises');

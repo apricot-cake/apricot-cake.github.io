@@ -228,7 +228,7 @@ export default function App() {
                 <div className="space-y-3"><Label htmlFor="thumbnail-size">サムネイルサイズ</Label><Slider id="thumbnail-size" aria-label="サムネイルサイズ" min={80} max={280} step={5} value={[thumbnailSize]} onValueChange={v=>setThumbnailSize(v[0])} /></div>
               </PopoverContent>
             </Popover>
-        <Button className="text-xs" size="sm" variant="outline" disabled={!boot} onClick={openFolder}><FolderOpen />フォルダーを開く</Button>
+        <Button className="text-xs" size="sm" variant="outline" disabled={!boot || boot.folderMissing} onClick={openFolder}><FolderOpen />フォルダーを開く</Button>
         <Button className="text-xs" size="sm" variant="outline" disabled={status !== '保存済み' || choosingFolder} onClick={selectFolder}><FolderOpen />フォルダー選択</Button>
 
         <div role="group" aria-label="操作履歴" className="flex items-center gap-1.5">
@@ -237,6 +237,7 @@ export default function App() {
         </div>
         <span role="status" className="flex items-center gap-1.5 text-xs text-muted-foreground"><span className={cn('size-1.5 rounded-full bg-neutral-400', status === '保存済み' && 'bg-[#328455]')} />{status}</span>
           </div>
+          {boot.folderMissing && <Alert className="mt-2" variant="destructive"><AlertDescription className="flex items-center justify-between gap-3">画像フォルダーが見つかりません。<Button size="sm" variant="outline" disabled={choosingFolder} onClick={selectFolder}>フォルダーを選択</Button></AlertDescription></Alert>}
           {selected.length >= 2 && <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground" data-testid="selection-bar"><span>{visible.length} 枚表示 · {selected.length} 枚選択</span><Button variant="ghost" size="xs" onClick={()=>setSelected([])}>解除</Button></div>}
         </div>
     <main className="grid min-h-0 flex-1 grid-cols-1 max-[759px]:overflow-auto min-[760px]:grid-cols-[minmax(0,1fr)_minmax(320px,38%)] min-[1200px]:grid-cols-[minmax(0,1fr)_410px]">
