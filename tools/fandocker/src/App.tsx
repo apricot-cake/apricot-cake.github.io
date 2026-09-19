@@ -290,7 +290,7 @@ export default function App() {
                     <Command.Input aria-label="キャラを検索" placeholder="キャラを検索・新規作成" value={tagQuery} onValueChange={setTagQuery} className="h-9 w-full rounded-md border border-input px-3 text-sm placeholder:text-muted-foreground" />
                     <Command.List className="max-h-64 overflow-y-auto [&_[cmdk-list-sizer]:not(:empty)]:pt-2">
                       {characters.map(t=><Command.Item key={t.id} value={t.id} onSelect={()=>{applyTag(t.id);setCharacterOpen(false);navigate(1)}} className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm data-[selected=true]:bg-accent">{selected.some(f=>doc.images[f]?.includes(t.id))&&<Check className="size-3" />}{t.name}</Command.Item>)}
-                      {tagQuery.trim()&&!doc.tags.some(t=>t.parent===work&&t.name===tagQuery.trim())&&<Command.Item value="__create__" onSelect={()=>{addTag(work);setCharacterOpen(false)}} className="cursor-pointer rounded-md px-2 py-2 text-sm data-[selected=true]:bg-accent">「{tagQuery.trim()}」を作成</Command.Item>}
+                      {tagQuery.trim()&&!doc.tags.some(t=>t.parent===work&&t.name===tagQuery.trim())&&<Command.Item value="__create__" onSelect={()=>{addTag(work);setCharacterOpen(false);navigate(1)}} className="cursor-pointer rounded-md px-2 py-2 text-sm data-[selected=true]:bg-accent">「{tagQuery.trim()}」を作成</Command.Item>}
                     </Command.List>
                   </Command>
                 </PopoverContent>
