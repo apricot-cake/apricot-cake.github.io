@@ -32,14 +32,49 @@
       <section aria-label="アプリ一覧">
         <ul class="card-list">
           <li>
-            <a class="card" href="https://chromewebstore.google.com/detail/sift/jglehalaegleehefcefnfmmbblgkomeh">
-              <div class="card-image"><img src="/assets/sift.png" alt="Sift の設定画面"></div>
-              <h2>Sift <svg class="external-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg><span class="sr-only">（Chrome ウェブストアで開く）</span></h2>
-              <p>SNSなどの投稿を反応数でフィルターする拡張機能</p>
-            </a>
+            <article class="card">
+              <button class="card-play" type="button" aria-controls="sift-video" aria-haspopup="dialog">
+                <span class="card-image"><img src="https://i.ytimg.com/vi/KqO-4fv2Qsw/maxresdefault.jpg" alt="Sift の紹介動画を再生"></span>
+                <span class="card-title">【作ってみた】いいね数でフィルターするやつ</span>
+              </button>
+            </article>
           </li>
         </ul>
       </section>
     </main>
+    <dialog class="video-dialog" id="sift-video" aria-label="Sift の紹介動画">
+      <div class="video-dialog__player"></div>
+    </dialog>
+    <script>
+      const playButton = document.querySelector('.card-play');
+      const card = playButton.closest('.card');
+      const dialog = document.querySelector('#sift-video');
+      const playerContainer = document.querySelector('.video-dialog__player');
+
+      playButton.addEventListener('click', () => {
+        if (!playerContainer.querySelector('iframe')) {
+          const player = document.createElement('iframe');
+          player.src = 'https://www.youtube-nocookie.com/embed/KqO-4fv2Qsw?autoplay=1&cc_load_policy=0';
+          player.title = 'Sift の紹介動画';
+          player.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+          player.allowFullscreen = true;
+          player.referrerPolicy = 'strict-origin-when-cross-origin';
+          playerContainer.append(player);
+        }
+
+        dialog.showModal();
+        card.classList.add('card--video-open');
+      });
+
+      dialog.addEventListener('close', () => {
+        playerContainer.replaceChildren();
+        card.classList.remove('card--video-open');
+        playButton.blur();
+      });
+
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+    </script>
   </body>
 </html>
