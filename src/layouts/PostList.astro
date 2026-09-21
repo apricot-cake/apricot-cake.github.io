@@ -2,7 +2,6 @@
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import ExternalLink from '@lucide/astro/icons/external-link';
-import CategoryNav from '../components/CategoryNav.astro';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
@@ -15,9 +14,8 @@ const { posts, category } = Astro.props;
  <head><BaseHead title={category ? 'アプリ | ' + SITE_TITLE : SITE_TITLE} /></head>
  <body>
   <Header />
-  <main id="main" class="mx-auto grid w-full max-w-[1200px] grid-cols-[132px_minmax(0,1fr)] content-start gap-12 px-8 pt-16 pb-24 max-[901px]:grid-cols-[108px_minmax(0,1fr)] max-[901px]:gap-8 max-[721px]:grid-cols-1 max-[721px]:px-5 max-[721px]:pt-8 max-[721px]:pb-16">
+  <main id="main" class="mx-auto w-full max-w-[864px] px-8 pt-16 pb-24 max-[721px]:px-5 max-[721px]:pt-8 max-[721px]:pb-16">
    <h1 class="sr-only">{category ? 'アプリ' : SITE_TITLE}</h1>
-   <aside><CategoryNav /></aside>
    <section aria-label={category ? 'アプリの記事' : 'すべての記事'}>
     <ul class="m-0 grid list-none grid-cols-2 gap-x-6 gap-y-10 p-0 max-[521px]:grid-cols-1 max-[521px]:gap-8">
      {posts.map(post => <li>
