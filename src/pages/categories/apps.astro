@@ -1,0 +1,10 @@
+---
+import { getCollection } from 'astro:content';
+import PostList from '../../layouts/PostList.astro';
+
+const posts = (await getCollection('blog', ({ data }) => data.category === 'apps')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<PostList posts={posts} category="apps" />

@@ -6,10 +6,6 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
 	site: 'https://apricot-cake.com',
-	trailingSlash: 'never',
-	redirects: {
-		'/categories/apps': '/apps',
-	},
- integrations: [mdx(), sitemap()],
+	integrations: [mdx(), sitemap()],
  vite: { plugins: [tailwindcss()] },
 });

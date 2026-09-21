@@ -8,7 +8,7 @@ const blog = defineCollection({
 	schema: ({ image }) =>
 		z.object({
 			title: z.string(),
-		filterPath: z.array(z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)).min(1),
+			category: z.enum(['apps']),
 			description: z.string().optional(),
 			cardUrl: z.string().url().optional(),
 			cardLinkLabel: z.string().optional(),

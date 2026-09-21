@@ -1,27 +1,6 @@
----
-import { filterTree, type FilterNode } from '../filter-tree';
-
-interface Props {
-	selectedPath?: string[];
-	tree?: readonly FilterNode[];
-	siteTitle: string;
-}
-
-const { selectedPath = [], tree = filterTree, siteTitle } = Astro.props;
-
-function flatten(nodes: readonly FilterNode[], parent: string[] = [], depth = 0): Array<{ path: string[]; label: string; depth: number }> {
-	return nodes.flatMap((node) => {
-		const path = [...parent, node.slug];
-		return [{ path, label: node.label, depth }, ...flatten(node.children ?? [], path, depth + 1)];
-	});
-}
-
-const filters = flatten(tree);
-const selectedKey = selectedPath.join('/');
----
-<nav aria-label="フィルター" data-filter-nav data-filter-site-title={siteTitle}>
+<nav aria-label="カテゴリ">
  <ul class="m-0 flex list-none flex-col items-start gap-2.5 p-0 max-[721px]:flex-row max-[721px]:flex-wrap">
-  <li><a class="inline-block min-w-[90px] rounded-full border border-line px-[18px] py-1.5 text-center text-xs leading-[1.75] text-muted no-underline transition-colors duration-150 ease-[ease] hover:border-slate-400 hover:text-ink aria-[current=page]:border-ink aria-[current=page]:bg-ink aria-[current=page]:text-white" href="/" data-filter-link data-filter-path="" data-filter-label="すべて" aria-current={!selectedKey ? 'page' : undefined}>すべて</a></li>
-  {filters.map(({ path, label, depth }) => <li style={`margin-inline-start: ${depth * 12}px`}><a class="inline-block min-w-[90px] rounded-full border border-line px-[18px] py-1.5 text-center text-xs leading-[1.75] text-muted no-underline transition-colors duration-150 ease-[ease] hover:border-slate-400 hover:text-ink aria-[current=page]:border-ink aria-[current=page]:bg-ink aria-[current=page]:text-white" href={`/${path.join('/')}`} data-filter-link data-filter-path={path.join('/')} data-filter-label={label} aria-current={selectedKey === path.join('/') ? 'page' : undefined}>{label}</a></li>)}
+  <li><a class="inline-block min-w-[90px] rounded-full border border-line px-[18px] py-1.5 text-center text-xs leading-[1.75] text-muted no-underline transition-colors duration-150 ease-[ease] hover:border-slate-400 hover:text-ink" href="/">すべて</a></li>
+  <li><a class="inline-block min-w-[90px] rounded-full border border-line px-[18px] py-1.5 text-center text-xs leading-[1.75] text-muted no-underline transition-colors duration-150 ease-[ease] hover:border-slate-400 hover:text-ink" href="/categories/apps/">アプリ</a></li>
  </ul>
 </nav>
