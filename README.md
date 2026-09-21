@@ -26,7 +26,7 @@ Fandocker は公開サイトとは独立したローカルツールとして `to
 
 ## 公開
 
-公開先は https://apricot-cake.github.io/ です。
+公開先は https://apricot-cake.com/ です。
 `.github/workflows/deploy.yml`が`main`へのpushを受けてビルドし、GitHub Pagesへ公開します。GitHubのSettings → Pagesで公開元をGitHub Actionsに設定します。
 
 ## ページとデザイン
