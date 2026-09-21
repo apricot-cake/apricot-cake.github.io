@@ -1,4 +1,4 @@
-# QL
+# ケーキ屋さん
 
 Astro・TypeScript・Astro Components・Tailwind CSS v4で作る個人サイトです。MarkdownとMDXに対応しています。
 
