@@ -50,7 +50,10 @@ const selectedLabel = getFilterLabel(selectedPath);
      const label = selectedLink?.dataset.filterLabel ?? 'すべて';
 
      for (const card of cards) card.hidden = !matchesPath(card.dataset.filterPath ?? '', filterPath);
-     for (const link of links) link.toggleAttribute('aria-current', link === selectedLink);
+     for (const link of links) {
+      if (link === selectedLink) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+     }
 
      document.title = filterPath ? `${label} | ${siteTitle}` : siteTitle;
      results.setAttribute('aria-label', filterPath ? `${label}の記事` : 'すべての記事');
