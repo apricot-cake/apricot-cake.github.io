@@ -20,7 +20,7 @@ a:focus-visible { outline: 2px solid var(--title); outline-offset: 5px; }
 .card:hover { background: #f3f3f3; }
 .card-play { background: none; border: 0; border-radius: 8px; color: inherit; cursor: pointer; display: block; font: inherit; padding: 12px; text-align: left; width: 100%; }
 .card-play:focus-visible { outline: 2px solid var(--title); outline-offset: 5px; }
-.card-image { background: var(--surface); border-radius: 8px; overflow: hidden; }
+.card-image { background: var(--surface); border-radius: 8px; display: block; overflow: hidden; }
 .card-image img { display: block; height: auto; width: 100%; }
 .card--placeholder { padding: 12px; }
 .card-placeholder { align-items: center; aspect-ratio: 16 / 9; background: var(--surface); border-radius: 8px; color: var(--muted); display: flex; font-size: 13px; justify-content: center; }
