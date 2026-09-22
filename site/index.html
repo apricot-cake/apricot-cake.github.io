@@ -11,6 +11,9 @@
     <meta property="og:title" content="@apricot-cake">
     <meta name="twitter:card" content="summary">
     <title>@apricot-cake</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css">
   </head>
   <body>
@@ -53,7 +56,6 @@
     </dialog>
     <script>
       const playButton = document.querySelector('.card-play');
-      const card = playButton.closest('.card');
       const dialog = document.querySelector('#sift-video');
       const playerContainer = document.querySelector('.video-dialog__player');
 
@@ -69,12 +71,10 @@
         }
 
         dialog.showModal();
-        card.classList.add('card--video-open');
       });
 
       dialog.addEventListener('close', () => {
         playerContainer.replaceChildren();
-        card.classList.remove('card--video-open');
         playButton.blur();
       });
 
