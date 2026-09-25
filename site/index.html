@@ -52,12 +52,18 @@
       </section>
     </main>
     <dialog class="video-dialog" id="sift-video" aria-label="Sift の紹介動画">
+      <button class="video-dialog__close" type="button" aria-label="閉じる" autofocus>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
       <div class="video-dialog__player"></div>
     </dialog>
     <script>
       const playButton = document.querySelector('.card-play');
       const dialog = document.querySelector('#sift-video');
       const playerContainer = document.querySelector('.video-dialog__player');
+      const closeButton = document.querySelector('.video-dialog__close');
+
+      closeButton.addEventListener('click', () => dialog.close());
 
       playButton.addEventListener('click', () => {
         if (!playerContainer.querySelector('iframe')) {
