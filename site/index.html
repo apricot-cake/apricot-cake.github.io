@@ -11,6 +11,7 @@
     <meta property="og:title" content="@apricot-cake">
     <meta name="twitter:card" content="summary">
     <title>@apricot-cake</title>
+    <link rel="preload" href="/assets/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&amp;display=swap" rel="stylesheet">
@@ -30,40 +31,40 @@
         </nav>
       </div>
     </header>
-    <main id="main" class="content">
-      <h1 class="sr-only">@apricot-cake</h1>
-      <section aria-label="アプリ一覧">
-        <ul class="card-list">
-          <li>
-            <article class="card">
+    <main id="main" class="content" tabindex="-1">
+      <h1 class="sr-only">@apricot-cake のアプリ一覧</h1>
+      <ul class="card-list" role="list">
+        <li>
+          <article class="card">
+            <h2 class="card-heading">
               <button class="card-play" type="button" aria-controls="sift-video" aria-haspopup="dialog">
-                <span class="card-image"><img src="https://i.ytimg.com/vi/KqO-4fv2Qsw/maxresdefault.jpg" alt="Sift の紹介動画を再生"></span>
+                <span class="card-image"><img src="https://i.ytimg.com/vi/KqO-4fv2Qsw/maxresdefault.jpg" alt="" width="1280" height="720" fetchpriority="high"></span>
                 <span class="card-title">いいね数でフィルターするやつ</span>
+                <span class="sr-only">紹介動画を開く</span>
               </button>
-            </article>
-          </li>
-          <li>
-            <article class="card card--placeholder" aria-label="ダミーカード">
-              <div class="card-placeholder" aria-hidden="true">Coming soon</div>
-              <span class="card-title">ダミーカード</span>
-            </article>
-          </li>
-        </ul>
-      </section>
+            </h2>
+          </article>
+        </li>
+        <li>
+          <article class="card card--placeholder">
+            <div class="card-placeholder" aria-hidden="true" lang="en">Coming soon</div>
+            <h2 class="card-title">ダミーカード</h2>
+          </article>
+        </li>
+      </ul>
     </main>
-    <dialog class="video-dialog" id="sift-video" aria-label="Sift の紹介動画">
-      <button class="video-dialog__close" type="button" aria-label="閉じる" autofocus>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
-      </button>
+    <dialog class="video-dialog" id="sift-video" aria-label="Sift の紹介動画" closedby="any">
+      <form method="dialog">
+        <button class="video-dialog__close" type="submit" aria-label="閉じる" autofocus>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </form>
       <div class="video-dialog__player"></div>
     </dialog>
     <script>
       const playButton = document.querySelector('.card-play');
       const dialog = document.querySelector('#sift-video');
       const playerContainer = document.querySelector('.video-dialog__player');
-      const closeButton = document.querySelector('.video-dialog__close');
-
-      closeButton.addEventListener('click', () => dialog.close());
 
       playButton.addEventListener('click', () => {
         if (!playerContainer.querySelector('iframe')) {
@@ -81,12 +82,20 @@
 
       dialog.addEventListener('close', () => {
         playerContainer.replaceChildren();
-        playButton.blur();
+        playButton.focus();
       });
 
-      dialog.addEventListener('click', (event) => {
-        if (event.target === dialog) dialog.close();
-      });
+      if (!('closedBy' in HTMLDialogElement.prototype)) {
+        dialog.addEventListener('click', (event) => {
+          if (event.target !== dialog) return;
+
+          const rect = dialog.getBoundingClientRect();
+          const isInside = event.clientX >= rect.left && event.clientX <= rect.right &&
+            event.clientY >= rect.top && event.clientY <= rect.bottom;
+
+          if (!isInside) dialog.close();
+        });
+      }
     </script>
   </body>
 </html>
