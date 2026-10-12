@@ -31,9 +31,6 @@ a:focus-visible { outline: 2px solid var(--title); outline-offset: 5px; }
 @media (max-width: 521px) { .card-list { grid-template-columns: 1fr; row-gap: 32px; } }
 @media (prefers-reduced-motion: reduce) { .card { transition: none; } }
 
-.portfolio-tabs:not([hidden]) { display: flex; gap: 16px; justify-content: center; margin: 0 0 28px; }
-.portfolio-tab { background: #fff; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); cursor: pointer; font: inherit; font-size: .8125rem; min-height: 44px; padding: 6px 22px; }
-.portfolio-tab[aria-selected="true"] { background: var(--title); border-color: var(--title); color: #fff; }
-.portfolio-tab:focus-visible { outline: 2px solid var(--title); outline-offset: 4px; }
+.portfolio-heading { align-items: center; color: var(--title); display: flex; font-size: 1.375rem; justify-content: center; line-height: 1.4; margin: 0 0 28px; min-height: 44px; }
 
 .social-x { background: currentColor; display: block; height: 20px; mask: url('/assets/x.svg') center / contain no-repeat; width: 20px; }
