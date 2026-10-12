@@ -37,11 +37,10 @@
         <li>
           <article class="card">
             <h2 class="card-heading">
-              <button class="card-play" type="button" aria-controls="sift-video" aria-haspopup="dialog">
+              <a class="card-link" href="https://apricot-cake.com/sift/">
                 <span class="card-image"><img src="https://i.ytimg.com/vi/KqO-4fv2Qsw/maxresdefault.jpg" alt="" width="1280" height="720" fetchpriority="high"></span>
                 <span class="card-title">いいね数でフィルターするやつ</span>
-                <span class="sr-only">紹介動画を開く</span>
-              </button>
+              </a>
             </h2>
           </article>
         </li>
@@ -53,49 +52,5 @@
         </li>
       </ul>
     </main>
-    <dialog class="video-dialog" id="sift-video" aria-label="Sift の紹介動画" closedby="any">
-      <form method="dialog">
-        <button class="video-dialog__close" type="submit" aria-label="閉じる" autofocus>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
-        </button>
-      </form>
-      <div class="video-dialog__player"></div>
-    </dialog>
-    <script>
-      const playButton = document.querySelector('.card-play');
-      const dialog = document.querySelector('#sift-video');
-      const playerContainer = document.querySelector('.video-dialog__player');
-
-      playButton.addEventListener('click', () => {
-        if (!playerContainer.querySelector('iframe')) {
-          const player = document.createElement('iframe');
-          player.src = 'https://www.youtube-nocookie.com/embed/KqO-4fv2Qsw?autoplay=0&cc_load_policy=0';
-          player.title = 'Sift の紹介動画';
-          player.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-          player.allowFullscreen = true;
-          player.referrerPolicy = 'strict-origin-when-cross-origin';
-          playerContainer.append(player);
-        }
-
-        dialog.showModal();
-      });
-
-      dialog.addEventListener('close', () => {
-        playerContainer.replaceChildren();
-        playButton.focus();
-      });
-
-      if (!('closedBy' in HTMLDialogElement.prototype)) {
-        dialog.addEventListener('click', (event) => {
-          if (event.target !== dialog) return;
-
-          const rect = dialog.getBoundingClientRect();
-          const isInside = event.clientX >= rect.left && event.clientX <= rect.right &&
-            event.clientY >= rect.top && event.clientY <= rect.bottom;
-
-          if (!isInside) dialog.close();
-        });
-      }
-    </script>
   </body>
 </html>
