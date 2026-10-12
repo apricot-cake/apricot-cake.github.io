@@ -36,3 +36,4 @@ a:focus-visible { outline: 2px solid var(--title); outline-offset: 5px; }
 .portfolio-tab[aria-selected="true"] { background: var(--title); border-color: var(--title); color: #fff; }
 .portfolio-tab:focus-visible { outline: 2px solid var(--title); outline-offset: 4px; }
 
+.social-x { background: currentColor; display: block; height: 20px; mask: url('/assets/x.svg') center / contain no-repeat; width: 20px; }
