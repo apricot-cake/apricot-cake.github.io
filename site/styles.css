@@ -22,13 +22,17 @@ a:focus-visible { outline: 2px solid var(--title); outline-offset: 5px; }
 .card-link { border-radius: 8px; display: block; padding: 12px; text-decoration: none; }
 .card-image { background: var(--surface); border-radius: 8px; display: block; overflow: hidden; }
 .card-image img { display: block; height: auto; width: 100%; }
-.card--placeholder { padding: 12px; }
-.card-placeholder { align-items: center; aspect-ratio: 16 / 9; background: var(--surface); border-radius: 8px; color: var(--muted); display: flex; font-size: .8125rem; justify-content: center; }
 .card-title { color: var(--title); display: block; font-size: 1rem; font-weight: 700; letter-spacing: .03em; line-height: 1.3; margin: 16px 0 0; }
-.card-link .card-title { color: var(--ink); }
-.card-audience-heading { font-weight: 700; margin: 16px 0 12px; }
+.card-link .card-title { color: var(--title); font-size: 1.375rem; line-height: 1.4; }
+.card-audience-heading { color: var(--muted); font-size: .8125rem; font-weight: 400; margin: 20px 0 10px; }
 .card-audience { color: var(--muted); display: grid; gap: 8px; margin: 0; padding-inline-start: 1.4em; }
 .sr-only { border: 0; clip-path: inset(50%); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; white-space: nowrap; width: 1px; }
 @media (max-width: 721px) { .site-header__inner { padding-inline: 20px; } .content { padding: 32px 20px 64px; } }
 @media (max-width: 521px) { .card-list { grid-template-columns: 1fr; row-gap: 32px; } }
 @media (prefers-reduced-motion: reduce) { .card { transition: none; } }
+
+.portfolio-tabs:not([hidden]) { display: flex; gap: 16px; justify-content: center; margin: 0 0 28px; }
+.portfolio-tab { background: #fff; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); cursor: pointer; font: inherit; font-size: .8125rem; min-height: 44px; padding: 6px 22px; }
+.portfolio-tab[aria-selected="true"] { background: var(--title); border-color: var(--title); color: #fff; }
+.portfolio-tab:focus-visible { outline: 2px solid var(--title); outline-offset: 4px; }
+

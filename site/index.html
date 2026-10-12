@@ -32,28 +32,31 @@
       </div>
     </header>
     <main id="main" class="content" tabindex="-1">
-      <h1 class="sr-only">@apricot-cake のアプリ一覧</h1>
+      <div class="portfolio-tabs" role="tablist" aria-label="作品の種類" hidden>
+        <button id="apps-tab" class="portfolio-tab" type="button" role="tab" aria-selected="true" aria-controls="apps-panel" tabindex="0">アプリ</button>
+        <button id="illustrations-tab" class="portfolio-tab" type="button" role="tab" aria-selected="false" aria-controls="illustrations-panel" tabindex="-1">イラスト</button>
+      </div>
+      <section id="apps-panel" role="tabpanel" aria-labelledby="apps-tab">
+
       <ul class="card-list" role="list">
         <li>
           <article class="card">
             <a class="card-link" href="https://apricot-cake.github.io/sift/" aria-labelledby="sift-title">
               <span class="card-image"><img src="/assets/sift.png" alt="" width="640" height="360" fetchpriority="high"></span>
               <h2 id="sift-title" class="card-title">sift</h2>
-              <p class="card-audience-heading">こんな人におすすめ</p>
+              <p class="card-audience-heading">こんなことができます</p>
               <ul class="card-audience">
-                <li>いつものタイムラインで人気のイラストを見つけたい</li>
-                <li>古い動画に埋もれがちな最近の人気動画を見つけたい</li>
+                <li>タイムラインで人気のイラストを探せます</li>
+                <li>埋もれがちな最近の人気動画を探せます</li>
               </ul>
             </a>
           </article>
         </li>
-        <li>
-          <article class="card card--placeholder">
-            <div class="card-placeholder" aria-hidden="true" lang="en">Coming soon</div>
-            <h2 class="card-title">ダミーカード</h2>
-          </article>
-        </li>
       </ul>
+      </section>
+      <section id="illustrations-panel" class="illustration-panel" role="tabpanel" aria-labelledby="illustrations-tab" tabindex="0" hidden>
+      </section>
     </main>
+    <script src="/portfolio.js" defer></script>
   </body>
 </html>
