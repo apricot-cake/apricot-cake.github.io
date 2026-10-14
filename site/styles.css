@@ -37,4 +37,3 @@ a:focus-visible { outline: 2px solid var(--title); outline-offset: 5px; }
 
 .card-image--icon { aspect-ratio: 16 / 9; display: grid; place-items: center; }
 .card-image--icon img { border-radius: 16px; height: 96px; width: 96px; }
-.card-description { color: var(--muted); margin: 20px 0 0; }
