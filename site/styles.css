@@ -28,7 +28,8 @@ a:focus-visible { outline: 2px solid var(--title); outline-offset: 5px; }
 .card-audience { color: var(--muted); display: grid; gap: 8px; margin: 0; padding-inline-start: 1.4em; }
 .sr-only { border: 0; clip-path: inset(50%); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; white-space: nowrap; width: 1px; }
 @media (max-width: 721px) { .site-header__inner { padding-inline: 20px; } .content { padding: 32px 20px 64px; } }
-@media (max-width: 521px) { .card-list { grid-template-columns: 1fr; row-gap: 32px; } }
+@media (max-width: 521px) { .site-header__inner { flex-wrap: nowrap; gap: 8px; padding-inline: 12px; } .site-name { font-size: 1rem; letter-spacing: 0; white-space: nowrap; } .card-list { grid-template-columns: 1fr; row-gap: 32px; } }
+@media (max-width: 360px) { .social-links a { min-width: 36px; } }
 @media (prefers-reduced-motion: reduce) { .card { transition: none; } }
 
 .portfolio-heading { align-items: center; color: var(--title); display: flex; font-size: 1.375rem; justify-content: center; line-height: 1.4; margin: 0 0 28px; min-height: 44px; }
